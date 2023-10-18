@@ -1,19 +1,24 @@
 package main
 
 import (
+	"ToDoBot1/clients/telegram"
 	"flag"
-	"fmt"
 	"log"
 )
 
+const (
+	tgBotHost = "api.telegram.org"
+)
+
 func main() {
-	token := mustToken()
-	fmt.Println(token)
+	// создание объекта для взаимодействия с api телеграма
+	tgClient := telegram.New(tgBotHost, mustToken())
 }
 
+// mustToken извлекает значение токена из флага tg-token
 func mustToken() string {
 	token := flag.String("tg-token", "", "telegram bot token") // объявляем флан для получения токена при запуске программы
-	
+
 	flag.Parse()
 
 	if *token == "" {
