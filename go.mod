@@ -1,3 +1,3 @@
-module CourseWorkSem3go
+module ToDoBot1
 
 go 1.21.1
