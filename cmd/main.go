@@ -1,7 +1,7 @@
 package main
 
 import (
-	"ToDoBot1/clients/telegram"
+	"ToDoBot1/pkg/clients/telegram"
 	"flag"
 	"log"
 )
