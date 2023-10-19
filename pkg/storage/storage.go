@@ -3,6 +3,7 @@ package storage
 type Storage interface {
 	Add(*Task) error
 	Delete(*Task) error
+	CloseTask(*Task) error
 	UnCompl(*User) ([]Task, error)
 	Compl(*User) ([]Task, error)
 }
