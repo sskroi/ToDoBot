@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	getUpdatesMethod = "getUpdates"
+	getUpdatesMethod  = "getUpdates"
 	sendMessageMethod = "sendMessage"
 )
 
@@ -21,6 +21,7 @@ type Client struct {
 	client   http.Client
 }
 
+// New возвращает объект для взаимодействия с API telegram
 func New(host string, token string) Client {
 	return Client{
 		host:     host,
