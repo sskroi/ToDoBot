@@ -1,16 +1,19 @@
-package sqlite3
+package sqlite
 
 import (
 	"ToDoBot1/pkg/storage"
 	"database/sql"
+	"errors"
 	"fmt"
 
-	_ "github.com/mattn/go-sqlite3"
+	"github.com/mattn/go-sqlite3"
 )
 
 type SqliteStorage struct {
 	db *sql.DB
 }
+
+var ErrUnique1 = errors.New("unique error")
 
 // New устанавливает соединение с файлом БД и возвращает
 // объект для взимодействия с базой данных sqlite3.
@@ -81,6 +84,11 @@ func (s *SqliteStorage) Add(task *storage.Task) error {
 					VALUES (?, ?, ?, ?, ?)`
 	_, err = s.db.Exec(qForAddTask, task.UserId, task.Title, task.Description, task.CreateTime, task.Deadline)
 	if err != nil {
+		/* проверяем, что ошибку можно преобразовать в тип ошибки sqlite3, если да, проверяем,
+		является ли эта ошибка ошибкой ErrConstraintUnique, если да, возвращаем кастомный тип ошибки ErrUnique1*/
+		if sqliteErr, ok := err.(sqlite3.Error); ok && sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {
+			return ErrUnique1
+		}
 		return fmt.Errorf("can't add task: %w", err)
 	}
 
