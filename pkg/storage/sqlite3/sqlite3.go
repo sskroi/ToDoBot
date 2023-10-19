@@ -69,7 +69,7 @@ func (s *SqliteStorage) Add(task *storage.Task) error {
 	err := s.db.QueryRow(qForCheckUser, task.UserId).Scan(&CheckUserRes)
 	if err == sql.ErrNoRows {
 		qForAddUser := `INSERT INTO users (user_id) VALUES (?);`
-		_, err = s.db.Exec(qForAddUser)
+		_, err = s.db.Exec(qForAddUser, task.UserId)
 		if err != nil {
 			return fmt.Errorf("can't create user: %w", err)
 		}
