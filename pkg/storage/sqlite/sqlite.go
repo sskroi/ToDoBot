@@ -14,9 +14,11 @@ type SqliteStorage struct {
 }
 
 var (
-	ErrUnique1 = errors.New("unique error")
-	ErrNotExist = errors.New("requested data does not exist")
+	ErrUnique1      = errors.New("unique error")
+	ErrNotExist     = errors.New("requested data does not exist")
+	ErrAlreayClosed = errors.New("task alreay closed")
 )
+
 // New устанавливает соединение с файлом БД и возвращает
 // объект для взимодействия с базой данных sqlite3.
 // Возвращает ошибку, если не удалось открыть файл с БД.
@@ -98,13 +100,11 @@ func (s *SqliteStorage) Add(task *storage.Task) error {
 }
 
 func (s *SqliteStorage) Delete(task *storage.Task) error {
-	qForCheckExist := `SELECT task_id FROM tasks WHERE user_id = ? AND title = ?;`
-
-	var checkExistRes int
-
-	err := s.db.QueryRow(qForCheckExist, task.UserId, task.Title).Scan(&checkExistRes)
-	if err == sql.ErrNoRows {
-		return ErrNotExist
+	err := s.isTaskExist(task)
+	if err == ErrNotExist {
+		return err
+	} else if err != nil {
+		return err
 	}
 
 	qForDelTask := `DELETE FROM tasks WHERE user_id = ? AND title = ?;`
@@ -112,6 +112,21 @@ func (s *SqliteStorage) Delete(task *storage.Task) error {
 
 	if err != nil {
 		return fmt.Errorf("can't delete task: %w", err)
+	}
+
+	return nil
+}
+
+func (s *SqliteStorage) isTaskExist(task *storage.Task) error {
+	qForCheckExist := `SELECT task_id FROM tasks WHERE user_id = ? AND title = ?;`
+
+	var checkExistRes int
+
+	err := s.db.QueryRow(qForCheckExist, task.UserId, task.Title).Scan(&checkExistRes)
+	if err == sql.ErrNoRows {
+		return ErrNotExist
+	} else if err != nil {
+		return fmt.Errorf("can't check task existence: %w,", err)
 	}
 
 	return nil
