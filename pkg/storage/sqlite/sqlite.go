@@ -13,8 +13,10 @@ type SqliteStorage struct {
 	db *sql.DB
 }
 
-var ErrUnique1 = errors.New("unique error")
-
+var (
+	ErrUnique1 = errors.New("unique error")
+	ErrNotExist = errors.New("requested data does not exist")
+)
 // New устанавливает соединение с файлом БД и возвращает
 // объект для взимодействия с базой данных sqlite3.
 // Возвращает ошибку, если не удалось открыть файл с БД.
@@ -90,6 +92,26 @@ func (s *SqliteStorage) Add(task *storage.Task) error {
 			return ErrUnique1
 		}
 		return fmt.Errorf("can't add task: %w", err)
+	}
+
+	return nil
+}
+
+func (s *SqliteStorage) Delete(task *storage.Task) error {
+	qForCheckExist := `SELECT task_id FROM tasks WHERE user_id = ? AND title = ?;`
+
+	var checkExistRes int
+
+	err := s.db.QueryRow(qForCheckExist, task.UserId, task.Title).Scan(&checkExistRes)
+	if err == sql.ErrNoRows {
+		return ErrNotExist
+	}
+
+	qForDelTask := `DELETE FROM tasks WHERE user_id = ? AND title = ?;`
+	_, err = s.db.Exec(qForDelTask, task.UserId, task.Title)
+
+	if err != nil {
+		return fmt.Errorf("can't delete task: %w", err)
 	}
 
 	return nil
