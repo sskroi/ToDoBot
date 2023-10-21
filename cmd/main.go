@@ -13,6 +13,7 @@ const (
 func main() {
 	// создание объекта для взаимодействия с api телеграма
 	tgClient := telegram.New(tgBotHost, mustToken())
+	_ = tgClient
 }
 
 // mustToken извлекает значение токена из флага tg-token

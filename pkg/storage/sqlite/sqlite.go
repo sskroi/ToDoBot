@@ -2,9 +2,9 @@ package sqlite
 
 import (
 	"ToDoBot1/pkg/storage"
+	"ToDoBot1/pkg/e"
 	"database/sql"
 	"errors"
-	"fmt"
 
 	"github.com/mattn/go-sqlite3"
 )
@@ -25,11 +25,11 @@ var (
 func New(path string) (*SqliteStorage, error) {
 	db, err := sql.Open("sqlite3", path)
 	if err != nil {
-		return nil, fmt.Errorf("can't open database: %w", err)
+		return nil, e.Wrap("can't open database", err)
 	}
 
 	if err := db.Ping(); err != nil {
-		return nil, fmt.Errorf("can't open database: %w", err)
+		return nil, e.Wrap("can't open database", err)
 	}
 
 	return &SqliteStorage{
@@ -46,7 +46,7 @@ func (s *SqliteStorage) Init() error {
 	);`
 	_, err := s.db.Exec(queryUsers)
 	if err != nil {
-		return fmt.Errorf("can't create table: %w", err)
+		return e.Wrap("can't create table `users`", err)
 	}
 
 	queryTasks := `CREATE TABLE IF NOT EXISTS tasks (
@@ -60,7 +60,7 @@ func (s *SqliteStorage) Init() error {
 		UNIQUE (user_id, title)
 	);`
 	if _, err := s.db.Exec(queryTasks); err != nil {
-		return fmt.Errorf("can't create table: %w", err)
+		return e.Wrap("can't create table `tasks`", err)
 	}
 
 	return nil
@@ -78,10 +78,10 @@ func (s *SqliteStorage) Add(task *storage.Task) error {
 		qForAddUser := `INSERT INTO users (user_id) VALUES (?);`
 		_, err = s.db.Exec(qForAddUser, task.UserId)
 		if err != nil {
-			return fmt.Errorf("can't create user: %w", err)
+			return e.Wrap("can't create user", err)
 		}
 	} else if err != nil {
-		return fmt.Errorf("can't check user: %w", err)
+		return e.Wrap("can't check user", err)
 	}
 
 	qForAddTask := `INSERT INTO tasks (user_id, title, description, create_time, deadline)
@@ -93,7 +93,7 @@ func (s *SqliteStorage) Add(task *storage.Task) error {
 		if sqliteErr, ok := err.(sqlite3.Error); ok && sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {
 			return ErrUnique1
 		}
-		return fmt.Errorf("can't add task: %w", err)
+		return e.Wrap("can't add task", err)
 	}
 
 	return nil
@@ -111,7 +111,7 @@ func (s *SqliteStorage) Delete(task *storage.Task) error {
 	_, err = s.db.Exec(qForDelTask, task.UserId, task.Title)
 
 	if err != nil {
-		return fmt.Errorf("can't delete task: %w", err)
+		return e.Wrap("can't delete task", err)
 	}
 
 	return nil
@@ -126,7 +126,7 @@ func (s *SqliteStorage) isTaskExist(task *storage.Task) error {
 	if err == sql.ErrNoRows {
 		return ErrNotExist
 	} else if err != nil {
-		return fmt.Errorf("can't check task existence: %w,", err)
+		return e.Wrap("can't delete task", err)
 	}
 
 	return nil
