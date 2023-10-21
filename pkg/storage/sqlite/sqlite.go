@@ -171,8 +171,9 @@ func (s *SqliteStorage) UpdDeadline(userId uint64, deadline, createTime uint64) 
 	return nil
 }
 
-func (s *SqliteStorage) Delete(task *storage.Task) error {
-	err := s.isTaskExist(task)
+// Delete deletes the user's task with specified title.
+func (s *SqliteStorage) Delete(userId uint64, title string) error {
+	err := s.isTaskExist(userId, title)
 	if err == ErrNotExist {
 		return err
 	} else if err != nil {
@@ -180,8 +181,8 @@ func (s *SqliteStorage) Delete(task *storage.Task) error {
 	}
 
 	qForDelTask := `DELETE FROM tasks WHERE user_id = ? AND title = ?;`
-	_, err = s.db.Exec(qForDelTask, task.UserId, task.Title)
 
+	_, err = s.db.Exec(qForDelTask, userId, title)
 	if err != nil {
 		return e.Wrap("can't delete task", err)
 	}
@@ -189,12 +190,13 @@ func (s *SqliteStorage) Delete(task *storage.Task) error {
 	return nil
 }
 
-func (s *SqliteStorage) isTaskExist(task *storage.Task) error {
+// isTaskExist checks if user has a task with title return nil if yes and ErrNotExist if not.
+func (s *SqliteStorage) isTaskExist(userId uint64, title string) error {
 	qForCheckExist := `SELECT task_id FROM tasks WHERE user_id = ? AND title = ?;`
 
 	var checkExistRes int
 
-	err := s.db.QueryRow(qForCheckExist, task.UserId, task.Title).Scan(&checkExistRes)
+	err := s.db.QueryRow(qForCheckExist, userId, title).Scan(&checkExistRes)
 	if err == sql.ErrNoRows {
 		return ErrNotExist
 	} else if err != nil {
