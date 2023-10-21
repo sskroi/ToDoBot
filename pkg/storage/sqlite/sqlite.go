@@ -136,6 +136,23 @@ func (s *SqliteStorage) UpdTitle(userId uint64, title string) error {
 	return nil
 }
 
+// UpdDescription set description for user's cur_task
+func (s *SqliteStorage) UpdDescription(userId uint64, description string) error {
+	taskId, err := s.getCurTask(userId)
+	if err != nil {
+		return err
+	}
+
+	qForUpdateDescr := `UPDATE tasks SET description = ? WHERE task_id = ?;`
+
+	_, err = s.db.Exec(qForUpdateDescr, description, taskId)
+	if err != nil {
+		return e.Wrap("can't update description in tasks", err)
+	}
+
+	return nil
+}
+
 func (s *SqliteStorage) Delete(task *storage.Task) error {
 	err := s.isTaskExist(task)
 	if err == ErrNotExist {
@@ -215,14 +232,3 @@ func (s *SqliteStorage) getCurTask(userId uint64) (uint64, error) {
 
 	return curTask, nil
 }
-
-/*
-if err != nil {
-		// проверяем, что ошибку можно преобразовать в тип ошибки sqlite3, если да, проверяем,
-		// является ли эта ошибка ошибкой ErrConstraintUnique, если да, возвращаем кастомный тип ошибки ErrUnique1
-		if sqliteErr, ok := err.(sqlite3.Error); ok && sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {
-			return ErrUnique1
-		}
-		return e.Wrap("can't add task", err)
-	}
-*/
