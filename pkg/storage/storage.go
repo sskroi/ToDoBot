@@ -19,17 +19,18 @@ const (
 )
 
 type Task struct {
-	Id          uint64
-	UserId      uint64
-	Title       string
-	Description string
-	CreateTime  uint64
-	Deadline    uint64
-	Done        bool
+	TaskId      uint64 `db:"task_id"`
+	UserId      uint64 `db:"user_id"`
+	Title       string `db:"title"`
+	Description string `db:"description"`
+	CreateTime  uint64 `db:"create_time"`
+	Deadline    uint64 `db:"deadline"`
+	Done        bool   `db:"done"`
 }
 
 type User struct {
-	Id       uint64
-	Username string
-	State    int
+	UserId   uint64 `db:"user_id"`
+	Username string `db:"username"`
+	State    int    `db:"state"`
+	CurTask  uint   `db:"cur_task"`
 }

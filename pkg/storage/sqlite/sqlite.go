@@ -44,7 +44,8 @@ func (s *SqliteStorage) Init() error {
 	queryUsers := `CREATE TABLE IF NOT EXISTS users (
 		user_id INT PRIMARY KEY,
 		username VARCHAR(255),
-		state INT DEFAULT ` + strconv.Itoa(storage.DefState) + `
+		state INT DEFAULT ` + strconv.Itoa(storage.DefState) + `,
+		cur_task INT DEFAULT 0
 	);`
 	_, err := s.db.Exec(queryUsers)
 	if err != nil {
@@ -66,6 +67,19 @@ func (s *SqliteStorage) Init() error {
 	}
 
 	return nil
+}
+
+func (s *SqliteStorage) GetState(user_id int) (int, error) {
+	qForGetUserState := `SELECT state FROM users WHERE user_id = ?;`
+
+	var userState int
+
+	err := s.db.QueryRow(qForGetUserState, user_id).Scan(&userState)
+	if err != nil {
+		return 0, e.Wrap("can't get user's state", err)
+	}
+
+	return userState, nil
 }
 
 // Add добавляет задачу в таблицу tasks. Если пользователя, который добавляет
