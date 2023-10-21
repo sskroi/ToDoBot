@@ -147,3 +147,24 @@ func (s *SqliteStorage) isTaskExist(task *storage.Task) error {
 
 	return nil
 }
+
+// checkUser checks if the user exists, if not,
+// creates a user with the specified UserId.
+func (s *SqliteStorage) checkUser(userId int) error {
+	qForCheckUser := `SELECT user_id FROM users WHERE user_id = ?;`
+
+	var checkUserRes int
+
+	err := s.db.QueryRow(qForCheckUser, userId).Scan(&checkUserRes)
+	if err == sql.ErrNoRows {
+		qForAddUser := `INSERT INTO users (user_id) VALUES (?);`
+		_, err = s.db.Exec(qForAddUser, userId)
+		if err != nil {
+			return e.Wrap("can't create user", err)
+		}
+	} else if err != nil {
+		return e.Wrap("can't check user", err)
+	}
+
+	return nil
+}
