@@ -147,7 +147,25 @@ func (s *SqliteStorage) UpdDescription(userId uint64, description string) error 
 
 	_, err = s.db.Exec(qForUpdateDescr, description, taskId)
 	if err != nil {
-		return e.Wrap("can't update description in tasks", err)
+		return e.Wrap("can't update description in `tasks`", err)
+	}
+
+	return nil
+}
+
+// UpdDeadline sets deadline and create_time for user's cur_task
+func (s *SqliteStorage) UpdDeadline(userId uint64, deadline, createTime uint64) error {
+	taskId, err := s.getCurTask(userId)
+	if err != nil {
+		return err
+	}
+
+	qForUpdDeadlineAndCreateTime :=
+		`UPDATE tasks SET create_time = ?, deadline = ? WHERE task_id = ?;`
+
+	_, err = s.db.Exec(qForUpdDeadlineAndCreateTime, createTime, deadline, taskId)
+	if err != nil {
+		return e.Wrap("can't update create time and deadline in `tasks`", err)
 	}
 
 	return nil
