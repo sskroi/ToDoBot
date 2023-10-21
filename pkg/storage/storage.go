@@ -8,6 +8,22 @@ type Storage interface {
 	Compl(*User) ([]Task, error)
 }
 
+// Types of state
+const (
+	DefState  int = 10
+	Adding1   int = 21
+	Adding2   int = 22
+	Adding3   int = 23
+	Deleting1 int = 31
+	Closing   int = 41
+)
+
+type Condition struct {
+	Type        int    `json:"type"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+}
+
 type Task struct {
 	Id          uint64
 	UserId      uint64
