@@ -1,11 +1,15 @@
 package storage
 
 type Storage interface {
-	Add(*Task) error
-	Delete(*Task) error
-	CloseTask(*Task) error
-	UnCompl(*User) ([]Task, error)
-	Compl(*User) ([]Task, error)
+	GetState(userId uint64) (int, error)
+	Add(userId uint64) error
+	UpdTitle(userId uint64, title string) error
+	UpdDescription(userId uint64, description string) error
+	UpdDeadline(userId uint64, deadline, createTime uint64) error
+	Delete(userId uint64, title string) error
+	CloseTask(userId uint64, title string) error
+	UnCompl(userId uint64) ([]Task, error)
+	Compl(userId uint64) ([]Task, error)
 }
 
 // Types of state
