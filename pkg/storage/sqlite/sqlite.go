@@ -71,7 +71,7 @@ func (s *SqliteStorage) Init() error {
 
 // GetState returns the state of the user or error
 // if can't to get the state of user
-func (s *SqliteStorage) GetState(userId int) (int, error) {
+func (s *SqliteStorage) GetState(userId uint64) (int, error) {
 	qForGetUserState := `SELECT state FROM users WHERE user_id = ?;`
 
 	var userState int
