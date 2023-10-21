@@ -179,6 +179,20 @@ func (s *SqliteStorage) setCurTask(userId uint64, taskId uint64) error {
 	return nil
 }
 
+// getCurTask returns user's cur_task
+func (s *SqliteStorage) getCurTask(userId uint64) (uint64, error) {
+	qForGetCurTask := `SELECT cur_task FROM users WHERE user_id = ?;`
+
+	var curTask uint64
+
+	err := s.db.QueryRow(qForGetCurTask, userId).Scan(&curTask)
+	if err != nil {
+		return 0, e.Wrap("can't get cur_task from users", err)
+	}
+
+	return curTask, nil
+}
+
 /*
 if err != nil {
 		// проверяем, что ошибку можно преобразовать в тип ошибки sqlite3, если да, проверяем,
