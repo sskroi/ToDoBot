@@ -18,7 +18,7 @@ const (
 	Closing   int = 41
 )
 
-type Condition struct {
+type State struct {
 	Type        int    `json:"type"`
 	Title       string `json:"title"`
 	Description string `json:"description"`
