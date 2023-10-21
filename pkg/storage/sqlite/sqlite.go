@@ -199,11 +199,20 @@ func (s *SqliteStorage) CloseTask(userId uint64, title string) error {
 		return err
 	}
 
-	qForUpdateDone := `UPDATE tasks SET done = 1 WHERE user_id = ? AND title = ?;`
+	qForUpdateDone := `UPDATE tasks SET done = 1 WHERE user_id = ? AND title = ? AND done != 1;`
 
-	_, err = s.db.Exec(qForUpdateDone, userId, title)
+	res, err := s.db.Exec(qForUpdateDone, userId, title)
 	if err != nil {
 		return e.Wrap("can't set done status", err)
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return e.Wrap("can't get rowsAffected info", err)
+	}
+
+	if rowsAffected == 0 {
+		return ErrAlreayClosed
 	}
 
 	return nil
