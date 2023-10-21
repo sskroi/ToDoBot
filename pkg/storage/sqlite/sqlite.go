@@ -84,8 +84,10 @@ func (s *SqliteStorage) GetState(userId int) (int, error) {
 	return userState, nil
 }
 
-// Add added the task in tasks table with specified UserId
-func (s *SqliteStorage) Add(userId int) error {
+// Add insert empty task in tasks table with specified UserId
+// and set the cur_task for the user with `userId` value of the newly created task.
+// Task add with NULL title, description, create_time and deadline.
+func (s *SqliteStorage) Add(userId uint64) error {
 	err := s.checkUser(userId)
 	if err != nil {
 		return err
@@ -93,9 +95,19 @@ func (s *SqliteStorage) Add(userId int) error {
 
 	qForAddTask := `INSERT INTO tasks (user_id) VALUES (?);`
 
-	_, err = s.db.Exec(qForAddTask, userId)
+	res, err := s.db.Exec(qForAddTask, userId)
 	if err != nil {
 		return e.Wrap("can't add task", err)
+	}
+
+	lastInsertId, err := res.LastInsertId()
+	if err != nil {
+		return e.Wrap("can't get last insert id", err)
+	}
+
+	err = s.setCurTask(userId, uint64(lastInsertId))
+	if err != nil {
+		return err
 	}
 
 	return nil
@@ -134,9 +146,9 @@ func (s *SqliteStorage) isTaskExist(task *storage.Task) error {
 	return nil
 }
 
-// checkUser checks if the user exists, if not,
-// creates a user with the specified UserId.
-func (s *SqliteStorage) checkUser(userId int) error {
+// checkUser check if the user with `UserId` exists, if not,
+// create user.
+func (s *SqliteStorage) checkUser(userId uint64) error {
 	qForCheckUser := `SELECT user_id FROM users WHERE user_id = ?;`
 
 	var checkUserRes int
@@ -150,6 +162,18 @@ func (s *SqliteStorage) checkUser(userId int) error {
 		}
 	} else if err != nil {
 		return e.Wrap("can't check user", err)
+	}
+
+	return nil
+}
+
+// setCurTask set the cur_task for the user with the specified `UserId`
+func (s *SqliteStorage) setCurTask(userId uint64, taskId uint64) error {
+	qForSetCurTask := `UPDATE users SET cur_task = ? WHERE user_id = ?;`
+
+	_, err := s.db.Exec(qForSetCurTask, taskId, userId)
+	if err != nil {
+		return e.Wrap("can't update cur_task in users", err)
 	}
 
 	return nil
