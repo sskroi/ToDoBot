@@ -190,6 +190,25 @@ func (s *SqliteStorage) Delete(userId uint64, title string) error {
 	return nil
 }
 
+// CloseTask sets the done field to 1 for the task
+func (s *SqliteStorage) CloseTask(userId uint64, title string) error {
+	err := s.isTaskExist(userId, title)
+	if err == ErrNotExist {
+		return err
+	} else if err != nil {
+		return err
+	}
+
+	qForUpdateDone := `UPDATE tasks SET done = 1 WHERE user_id = ? AND title = ?;`
+
+	_, err = s.db.Exec(qForUpdateDone, userId, title)
+	if err != nil {
+		return e.Wrap("can't set done status", err)
+	}
+
+	return nil
+}
+
 // isTaskExist checks if user has a task with title return nil if yes and ErrNotExist if not.
 func (s *SqliteStorage) isTaskExist(userId uint64, title string) error {
 	qForCheckExist := `SELECT task_id FROM tasks WHERE user_id = ? AND title = ?;`
