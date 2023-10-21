@@ -15,14 +15,8 @@ const (
 	Adding2   int = 22
 	Adding3   int = 23
 	Deleting1 int = 31
-	Closing   int = 41
+	Closing1  int = 41
 )
-
-type State struct {
-	Type        int    `json:"type"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
-}
 
 type Task struct {
 	Id          uint64
@@ -37,4 +31,5 @@ type Task struct {
 type User struct {
 	Id       uint64
 	Username string
+	State    int
 }

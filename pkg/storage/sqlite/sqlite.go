@@ -1,10 +1,11 @@
 package sqlite
 
 import (
-	"ToDoBot1/pkg/storage"
 	"ToDoBot1/pkg/e"
+	"ToDoBot1/pkg/storage"
 	"database/sql"
 	"errors"
+	"strconv"
 
 	"github.com/mattn/go-sqlite3"
 )
@@ -42,7 +43,8 @@ func New(path string) (*SqliteStorage, error) {
 func (s *SqliteStorage) Init() error {
 	queryUsers := `CREATE TABLE IF NOT EXISTS users (
 		user_id INT PRIMARY KEY,
-		username VARCHAR(255)
+		username VARCHAR(255),
+		state INT DEFAULT ` + strconv.Itoa(storage.DefState) + `
 	);`
 	_, err := s.db.Exec(queryUsers)
 	if err != nil {
