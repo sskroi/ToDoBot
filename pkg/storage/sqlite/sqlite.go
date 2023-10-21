@@ -7,7 +7,7 @@ import (
 	"errors"
 	"strconv"
 
-	"github.com/mattn/go-sqlite3"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 type SqliteStorage struct {
@@ -55,10 +55,10 @@ func (s *SqliteStorage) Init() error {
 	queryTasks := `CREATE TABLE IF NOT EXISTS tasks (
 		task_id INTEGER PRIMARY KEY AUTOINCREMENT,
 		user_id INTEGER NOT NULL,
-		title TEXT NOT NULL,
+		title TEXT,
 		description TEXT,
-		create_time INTEGER NOT NULL,
-		deadline INTEGER NOT NULL,
+		create_time INTEGER,
+		deadline INTEGER,
 		done INTEGER NOT NULL DEFAULT 0,
 		UNIQUE (user_id, title)
 	);`
@@ -69,12 +69,14 @@ func (s *SqliteStorage) Init() error {
 	return nil
 }
 
-func (s *SqliteStorage) GetState(user_id int) (int, error) {
+// GetState returns the state of the user or error
+// if can't to get the state of user
+func (s *SqliteStorage) GetState(userId int) (int, error) {
 	qForGetUserState := `SELECT state FROM users WHERE user_id = ?;`
 
 	var userState int
 
-	err := s.db.QueryRow(qForGetUserState, user_id).Scan(&userState)
+	err := s.db.QueryRow(qForGetUserState, userId).Scan(&userState)
 	if err != nil {
 		return 0, e.Wrap("can't get user's state", err)
 	}
@@ -82,33 +84,17 @@ func (s *SqliteStorage) GetState(user_id int) (int, error) {
 	return userState, nil
 }
 
-// Add добавляет задачу в таблицу tasks. Если пользователя, который добавляет
-// задачу, нету в таблице users - добавляет его в таблицу users.
-func (s *SqliteStorage) Add(task *storage.Task) error {
-	qForCheckUser := `SELECT user_id FROM users WHERE user_id = ?;`
-
-	var CheckUserRes int
-
-	err := s.db.QueryRow(qForCheckUser, task.UserId).Scan(&CheckUserRes)
-	if err == sql.ErrNoRows {
-		qForAddUser := `INSERT INTO users (user_id) VALUES (?);`
-		_, err = s.db.Exec(qForAddUser, task.UserId)
-		if err != nil {
-			return e.Wrap("can't create user", err)
-		}
-	} else if err != nil {
-		return e.Wrap("can't check user", err)
+// Add added the task in tasks table with specified UserId
+func (s *SqliteStorage) Add(userId int) error {
+	err := s.checkUser(userId)
+	if err != nil {
+		return err
 	}
 
-	qForAddTask := `INSERT INTO tasks (user_id, title, description, create_time, deadline)
-					VALUES (?, ?, ?, ?, ?)`
-	_, err = s.db.Exec(qForAddTask, task.UserId, task.Title, task.Description, task.CreateTime, task.Deadline)
+	qForAddTask := `INSERT INTO tasks (user_id) VALUES (?);`
+
+	_, err = s.db.Exec(qForAddTask, userId)
 	if err != nil {
-		/* проверяем, что ошибку можно преобразовать в тип ошибки sqlite3, если да, проверяем,
-		является ли эта ошибка ошибкой ErrConstraintUnique, если да, возвращаем кастомный тип ошибки ErrUnique1*/
-		if sqliteErr, ok := err.(sqlite3.Error); ok && sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {
-			return ErrUnique1
-		}
 		return e.Wrap("can't add task", err)
 	}
 
@@ -168,3 +154,14 @@ func (s *SqliteStorage) checkUser(userId int) error {
 
 	return nil
 }
+
+/*
+if err != nil {
+		// проверяем, что ошибку можно преобразовать в тип ошибки sqlite3, если да, проверяем,
+		// является ли эта ошибка ошибкой ErrConstraintUnique, если да, возвращаем кастомный тип ошибки ErrUnique1
+		if sqliteErr, ok := err.(sqlite3.Error); ok && sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {
+			return ErrUnique1
+		}
+		return e.Wrap("can't add task", err)
+	}
+*/
