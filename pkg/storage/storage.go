@@ -8,7 +8,7 @@ type Storage interface {
 	UpdDeadline(userId uint64, deadline, createTime uint64) error
 	Delete(userId uint64, title string) error
 	CloseTask(userId uint64, title string) error
-	UnCompl(userId uint64) ([]Task, error)
+	Uncompl(userId uint64) ([]Task, error)
 	Compl(userId uint64) ([]Task, error)
 }
 

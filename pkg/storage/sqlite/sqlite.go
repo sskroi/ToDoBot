@@ -43,7 +43,7 @@ func New(path string) (*SqliteStorage, error) {
 func (s *SqliteStorage) Init() error {
 	queryUsers := `CREATE TABLE IF NOT EXISTS users (
 		user_id INT PRIMARY KEY,
-		username VARCHAR(255),
+		username VARCHAR(255) DEFAULT "",
 		state INT DEFAULT ` + strconv.Itoa(storage.DefState) + `,
 		cur_task INT DEFAULT 0
 	);`
@@ -55,10 +55,10 @@ func (s *SqliteStorage) Init() error {
 	queryTasks := `CREATE TABLE IF NOT EXISTS tasks (
 		task_id INTEGER PRIMARY KEY AUTOINCREMENT,
 		user_id INTEGER NOT NULL,
-		title TEXT,
-		description TEXT,
-		create_time INTEGER,
-		deadline INTEGER,
+		title TEXT DEFAULT "",
+		description TEXT DEFAULT "",
+		create_time INTEGER DEFAULT 0,
+		deadline INTEGER DEFAULT 0,
 		done INTEGER NOT NULL DEFAULT 0,
 		UNIQUE (user_id, title)
 	);`
@@ -207,6 +207,63 @@ func (s *SqliteStorage) CloseTask(userId uint64, title string) error {
 	}
 
 	return nil
+}
+
+// Uncompl returns slice of uncompleted tasks for specified user.
+func (s *SqliteStorage) Uncompl(userId uint64) ([]storage.Task, error) {
+	tasks, err := s.getTasks(userId, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	return tasks, nil
+}
+
+// Compl returns slice of uncompleted tasks for specified user.
+func (s *SqliteStorage) Compl(userId uint64) ([]storage.Task, error) {
+	tasks, err := s.getTasks(userId, 1)
+	if err != nil {
+		return nil, err
+	}
+
+	return tasks, nil
+}
+
+// getTask returns slice of uncompleted tasks for user if qFilter = 0
+// and slice of completed tasks if qFilter = 1.
+func (s *SqliteStorage) getTasks(userId uint64, qFilter int) ([]storage.Task, error) {
+	var qForGetTasks string
+
+	switch qFilter {
+	case 0:
+		qForGetTasks =
+			`SELECT * FROM tasks WHERE user_id = ? AND done = 0;`
+	case 1:
+		qForGetTasks =
+			`SELECT * FROM tasks WHERE user_id = ? AND done = 1;`
+	default:
+		return nil, errors.New("unknown qFilter")
+	}
+
+	rows, err := s.db.Query(qForGetTasks, userId)
+	if err != nil {
+		return nil, e.Wrap("can't select uncomp tasks", err)
+	}
+	defer rows.Close()
+
+	tasks := make([]storage.Task, 0)
+
+	for rows.Next() {
+		var newT = storage.Task{}
+		err := rows.Scan(&newT.TaskId, &newT.UserId, &newT.Title,
+			&newT.Description, &newT.CreateTime, &newT.Deadline, &newT.Done)
+		if err != nil {
+			return nil, e.Wrap("can't scan tasks", err)
+		}
+		tasks = append(tasks, newT)
+	}
+
+	return tasks, nil
 }
 
 // isTaskExist checks if user has a task with title return nil if yes and ErrNotExist if not.
