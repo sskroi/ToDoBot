@@ -7,7 +7,7 @@ import (
 	"errors"
 	"strconv"
 
-	_ "github.com/mattn/go-sqlite3"
+	"github.com/mattn/go-sqlite3"
 )
 
 type SqliteStorage struct {
@@ -108,6 +108,29 @@ func (s *SqliteStorage) Add(userId uint64) error {
 	err = s.setCurTask(userId, uint64(lastInsertId))
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+// UpdTitle sets title for user's cur_task.
+// if task with same title exists for this user, returns ErrUnique1.
+func (s *SqliteStorage) UpdTitle(userId uint64, title string) error {
+	taskId, err := s.getCurTask(userId)
+	if err != nil {
+		return err
+	}
+
+	qForUpdateTitle := `UPDATE tasks SET title = ? WHERE task_id = ?;`
+
+	_, err = s.db.Exec(qForUpdateTitle, title, taskId)
+	if err != nil {
+		// проверяем, что ошибку можно преобразовать в тип ошибки sqlite3, если да, проверяем,
+		// является ли эта ошибка ошибкой ErrConstraintUnique, если да, возвращаем кастомный тип ошибки ErrUnique1
+		if sqliteErr, ok := err.(sqlite3.Error); ok && sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {
+			return ErrUnique1
+		}
+		return e.Wrap("can't add task", err)
 	}
 
 	return nil
