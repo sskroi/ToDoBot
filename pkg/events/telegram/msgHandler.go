@@ -35,6 +35,8 @@ func (p *Processor) handleMsg(text string, meta Meta) error {
 		err = p.doCmd(text, meta)
 	case storage.Adding1:
 		err = p.adding1(text, meta)
+	case storage.Adding2:
+		err = p.adding2(text, meta)
 	}
 
 	if err != nil {
@@ -213,6 +215,23 @@ func (p *Processor) adding1(text string, meta Meta) error {
 
 	if err := p.tg.SendMessage(int(meta.ChatId), addingMsg+successTitleSetMsg); err != nil {
 		return e.Wrap(errMsg, err)
+	}
+
+	return nil
+}
+
+func (p *Processor) adding2(text string, meta Meta) error {
+	err := p.storage.UpdDescription(meta.UserId, text)
+	if err != nil {
+		return e.Wrap("can't add description to task", err)
+	}
+
+	if err := p.storage.SetState(meta.UserId, storage.Adding3); err != nil {
+		return e.Wrap("can't add description to task", err)
+	}
+
+	if err := p.tg.SendMessage(int(meta.ChatId), successDescrSetMsg); err != nil {
+		return e.Wrap("can't add description to task", err)
 	}
 
 	return nil
