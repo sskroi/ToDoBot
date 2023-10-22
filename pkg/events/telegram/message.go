@@ -6,12 +6,6 @@ const (
 	startMsg = "/help для получения информации о боте"
 )
 
-const (
-	incorrectTitleMsg   = "Некорректное название задачи.\n\nПопробуйте снова:"
-	taskAlreadyExistMsg = "Задача с таким названием уже существует.\n\nПопробуйте другое название:"
-	successTitleSetMsg  = "Название успешно установлено.\n\nВведите описание задачи:"
-)
-
 // Text for output information about tasks
 const (
 	noUncomplTasksMsg = "У вас нет незавершённых задач."
@@ -22,8 +16,11 @@ const (
 
 // Text for adding task
 const (
-	addingMsg         = "Добавление задачи -> "
-	addingTitleMsg    = "Введите уникальное название для новой задачи:"
-	addingDescrMsg    = "Введите описание для новой задачи:"
-	addingDeadlineMsg = "Введите дату дедлайна для новой задачи в формате ???:"
+	addingMsg           = "Добавление задачи -> "
+	incorrectTitleMsg   = "Некорректное название задачи.\n\nПопробуйте снова:"
+	taskAlreadyExistMsg = "Задача с таким названием уже существует.\n\nПопробуйте другое название:"
+	successTitleSetMsg  = "Название успешно установлено.\n\nВведите описание задачи:"
+	addingTitleMsg      = "Введите уникальное название для новой задачи:"
+	// addingDescrMsg      = "Введите описание для новой задачи:"
+	// addingDeadlineMsg   = "Введите дату дедлайна для новой задачи в формате ???:"
 )
