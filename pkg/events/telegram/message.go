@@ -7,9 +7,9 @@ const (
 )
 
 const (
-	incorrectTitleMsg   = "Некорректное название задачи. Попробуйте снова."
-	taskAlreadyExistMsg = "Задача с таким названием уже существует. Попробуйте другое название."
-	successTitleSetMsg  = "Название успешно установлено. Введите описание задачи:"
+	incorrectTitleMsg   = "Некорректное название задачи.\n\nПопробуйте снова:"
+	taskAlreadyExistMsg = "Задача с таким названием уже существует.\n\nПопробуйте другое название:"
+	successTitleSetMsg  = "Название успешно установлено.\n\nВведите описание задачи:"
 )
 
 // Text for output information about tasks
