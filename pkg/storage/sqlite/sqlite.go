@@ -66,11 +66,16 @@ func (s *SqliteStorage) Init() error {
 // GetState returns the state of the user or error
 // if can't to get the state of user
 func (s *SqliteStorage) GetState(userId uint64) (int, error) {
+	err := s.checkUser(userId)
+	if err != nil {
+		return 0, err
+	}
+
 	qForGetUserState := `SELECT state FROM users WHERE user_id = ?;`
 
 	var userState int
 
-	err := s.db.QueryRow(qForGetUserState, userId).Scan(&userState)
+	err = s.db.QueryRow(qForGetUserState, userId).Scan(&userState)
 	if err != nil {
 		return 0, e.Wrap("can't get user's state", err)
 	}
