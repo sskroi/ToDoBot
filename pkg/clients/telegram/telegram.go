@@ -55,6 +55,8 @@ func (c *Client) SendMessage(chatId uint64, text string) error {
 	querryParams.Add("chat_id", strconv.FormatUint(chatId, 10))
 	querryParams.Add("text", text)
 
+	querryParams.Add("parse_mode", "HTML")
+
 	_, err := c.doRequest(sendMessageMethod, querryParams)
 	if err != nil {
 		return e.Wrap("can't send message", err)
