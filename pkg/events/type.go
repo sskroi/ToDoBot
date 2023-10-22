@@ -1,11 +1,8 @@
 package events
 
-type Fetcher interface {
-	Fetch(limit int) ([]Event, error)
-}
-
 type Processor interface {
 	Process(e Event) error
+	Fetch(limit int) ([]Event, error)
 }
 
 type EvType int
