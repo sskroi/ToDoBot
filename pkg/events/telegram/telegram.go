@@ -5,6 +5,7 @@ import (
 	"ToDoBot1/pkg/e"
 	"ToDoBot1/pkg/events"
 	"ToDoBot1/pkg/storage"
+	"errors"
 )
 
 type Processor struct {
@@ -14,10 +15,16 @@ type Processor struct {
 }
 
 type Meta struct {
-	UserId uint64
-	ChatId uint64
-	Date   uint64
+	UserId   uint64
+	ChatId   uint64
+	Username string
+	Date     uint64
 }
+
+var (
+	ErrUnknownEventType = errors.New("unknown event type")
+	ErrUnknownMetaType  = errors.New("unknown meta type")
+)
 
 func New(tgClient *telegram.Client, storage storage.Storage) *Processor {
 	return &Processor{
@@ -47,6 +54,46 @@ func (p *Processor) Fetch(limit int) ([]events.Event, error) {
 	return result, nil
 }
 
+func (p *Processor) Process(event events.Event) error {
+	var err error
+
+	switch event.Type {
+	case events.Message:
+		err = p.processMessage(event)
+	default:
+		return e.Wrap("can't process message", ErrUnknownEventType)
+	}
+
+	if err != nil {
+		e.Wrap("can't process event", err)
+	}
+
+	return nil
+}
+
+func (p *Processor) processMessage(event events.Event) error {
+	meta, err := getMeta(event)
+	if err != nil {
+		return e.Wrap("can't process message", err)
+	}
+
+	err = p.handleMsg(event.Text, meta)
+	if err != nil {
+		return e.Wrap("can't process message", err)
+	}
+
+	return nil
+}
+
+func getMeta(event events.Event) (Meta, error) {
+	meta, ok := event.Meta.(Meta)
+	if !ok {
+		return Meta{}, e.Wrap("can't get meta", ErrUnknownMetaType)
+	}
+
+	return meta, nil
+}
+
 func event(upd telegram.Update) events.Event {
 	updType := fetchType(upd)
 
@@ -57,9 +104,10 @@ func event(upd telegram.Update) events.Event {
 
 	if updType == events.Message {
 		res.Meta = Meta{
-			UserId: upd.Message.From.UserId,
-			ChatId: upd.Message.Chat.ChatId,
-			Date:   upd.Message.Date,
+			UserId:   upd.Message.From.UserId,
+			ChatId:   upd.Message.Chat.ChatId,
+			Username: upd.Message.From.Username,
+			Date:     upd.Message.Date,
 		}
 	}
 
