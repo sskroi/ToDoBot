@@ -14,12 +14,6 @@ type SqliteStorage struct {
 	db *sql.DB
 }
 
-var (
-	ErrUnique1      = errors.New("unique error")
-	ErrNotExist     = errors.New("requested data does not exist")
-	ErrAlreayClosed = errors.New("task alreay closed")
-)
-
 // New устанавливает соединение с файлом БД и возвращает
 // объект для взимодействия с базой данных sqlite3.
 // Возвращает ошибку, если не удалось открыть файл с БД.
@@ -114,7 +108,7 @@ func (s *SqliteStorage) Add(userId uint64) error {
 }
 
 // UpdTitle sets title for user's cur_task.
-// if task with same title exists for this user, returns ErrUnique1.
+// if task with same title exists for this user, returns storage.ErrUnique.
 func (s *SqliteStorage) UpdTitle(userId uint64, title string) error {
 	taskId, err := s.getCurTask(userId)
 	if err != nil {
@@ -128,7 +122,7 @@ func (s *SqliteStorage) UpdTitle(userId uint64, title string) error {
 		// проверяем, что ошибку можно преобразовать в тип ошибки sqlite3, если да, проверяем,
 		// является ли эта ошибка ошибкой ErrConstraintUnique, если да, возвращаем кастомный тип ошибки ErrUnique1
 		if sqliteErr, ok := err.(sqlite3.Error); ok && sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {
-			return ErrUnique1
+			return storage.ErrUnique
 		}
 		return e.Wrap("can't add task", err)
 	}
@@ -171,10 +165,11 @@ func (s *SqliteStorage) UpdDeadline(userId uint64, deadline, createTime uint64) 
 	return nil
 }
 
-// Delete deletes the user's task with specified title.
+// Delete deletes the user's task with specified title and
+// returns ErrNotExist if task not exist
 func (s *SqliteStorage) Delete(userId uint64, title string) error {
 	err := s.isTaskExist(userId, title)
-	if err == ErrNotExist {
+	if err == storage.ErrNotExist {
 		return err
 	} else if err != nil {
 		return err
@@ -190,10 +185,12 @@ func (s *SqliteStorage) Delete(userId uint64, title string) error {
 	return nil
 }
 
-// CloseTask sets the done field to 1 for the task
+// CloseTask sets the done field to 1 for the task and
+// returns storage.ErrAlreayClosed if task already closed
+// returns ErrNotExist if task not exist
 func (s *SqliteStorage) CloseTask(userId uint64, title string) error {
 	err := s.isTaskExist(userId, title)
-	if err == ErrNotExist {
+	if err == storage.ErrNotExist {
 		return err
 	} else if err != nil {
 		return err
@@ -212,7 +209,7 @@ func (s *SqliteStorage) CloseTask(userId uint64, title string) error {
 	}
 
 	if rowsAffected == 0 {
-		return ErrAlreayClosed
+		return storage.ErrAlreayClosed
 	}
 
 	return nil
@@ -275,7 +272,7 @@ func (s *SqliteStorage) getTasks(userId uint64, qFilter int) ([]storage.Task, er
 	return tasks, nil
 }
 
-// isTaskExist checks if user has a task with title return nil if yes and ErrNotExist if not.
+// isTaskExist checks if user has a task with title return nil if yes and storage.ErrNotExist if not.
 func (s *SqliteStorage) isTaskExist(userId uint64, title string) error {
 	qForCheckExist := `SELECT task_id FROM tasks WHERE user_id = ? AND title = ?;`
 
@@ -283,7 +280,7 @@ func (s *SqliteStorage) isTaskExist(userId uint64, title string) error {
 
 	err := s.db.QueryRow(qForCheckExist, userId, title).Scan(&checkExistRes)
 	if err == sql.ErrNoRows {
-		return ErrNotExist
+		return storage.ErrNotExist
 	} else if err != nil {
 		return e.Wrap("can't delete task", err)
 	}

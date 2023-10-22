@@ -1,5 +1,9 @@
 package storage
 
+import (
+	"errors"
+)
+
 type Storage interface {
 	GetState(userId uint64) (int, error)
 	Add(userId uint64) error
@@ -20,6 +24,12 @@ const (
 	Adding3   int = 23
 	Deleting1 int = 31
 	Closing1  int = 41
+)
+
+var (
+	ErrUnique      = errors.New("unique error")
+	ErrNotExist     = errors.New("requested data does not exist")
+	ErrAlreayClosed = errors.New("task alreay closed")
 )
 
 type Task struct {
