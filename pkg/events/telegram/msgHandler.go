@@ -73,7 +73,7 @@ func (p *Processor) doCmd(text string, meta Meta) error {
 }
 
 func (p *Processor) doUnknownCmd(meta Meta) error {
-	err := p.tg.SendMessage(int(meta.ChatId), "Неизвестная комманда. /help - для просмотра доступных команд.")
+	err := p.tg.SendMessage(meta.ChatId, "Неизвестная комманда. /help - для просмотра доступных команд.")
 	if err != nil {
 		return e.Wrap("can't do UnknownCmd", err)
 	}
@@ -82,7 +82,7 @@ func (p *Processor) doUnknownCmd(meta Meta) error {
 }
 
 func (p *Processor) doStartCmd(meta Meta) error {
-	err := p.tg.SendMessage(int(meta.ChatId), startMsg)
+	err := p.tg.SendMessage(meta.ChatId, startMsg)
 	if err != nil {
 		return e.Wrap("can't do /start", err)
 	}
@@ -91,7 +91,7 @@ func (p *Processor) doStartCmd(meta Meta) error {
 }
 
 func (p *Processor) doHelpCmd(meta Meta) error {
-	err := p.tg.SendMessage(int(meta.ChatId), helpMsg)
+	err := p.tg.SendMessage(meta.ChatId, helpMsg)
 	if err != nil {
 		return e.Wrap("can't do /help", err)
 	}
@@ -110,7 +110,7 @@ func (p *Processor) doAddCmd(meta Meta) error {
 		return e.Wrap("can't do /add", err)
 	}
 
-	err = p.tg.SendMessage(int(meta.ChatId), "Добавление задачи -> введите уникальное название:")
+	err = p.tg.SendMessage(meta.ChatId, "Добавление задачи -> введите уникальное название:")
 	if err != nil {
 		return e.Wrap("can't do /add", err)
 	}
@@ -124,7 +124,7 @@ func (p *Processor) doCloseCmd(meta Meta) error {
 		return e.Wrap("can't do /close", err)
 	}
 
-	err = p.tg.SendMessage(int(meta.ChatId), "Завершение задачи -> введите название задачи:")
+	err = p.tg.SendMessage(meta.ChatId, "Завершение задачи -> введите название задачи:")
 	if err != nil {
 		return e.Wrap("can't do /add", err)
 	}
@@ -139,7 +139,7 @@ func (p *Processor) doUncomplCmd(meta Meta) error {
 	}
 
 	if len(tasks) == 0 {
-		p.tg.SendMessage(int(meta.ChatId), noUncomplTasksMsg)
+		p.tg.SendMessage(meta.ChatId, noUncomplTasksMsg)
 		if err != nil {
 			return e.Wrap("can't do /uncompl", err)
 		}
@@ -151,7 +151,7 @@ func (p *Processor) doUncomplCmd(meta Meta) error {
 
 	sentStr := UnComplTasksMsg + tasksStr
 
-	p.tg.SendMessage(int(meta.ChatId), sentStr)
+	p.tg.SendMessage(meta.ChatId, sentStr)
 	if err != nil {
 		return e.Wrap("can't do /uncompl", err)
 	}
@@ -166,7 +166,7 @@ func (p *Processor) doComplCmd(meta Meta) error {
 	}
 
 	if len(tasks) == 0 {
-		p.tg.SendMessage(int(meta.ChatId), noComplTasksMsg)
+		p.tg.SendMessage(meta.ChatId, noComplTasksMsg)
 		if err != nil {
 			return e.Wrap("can't do /uncompl", err)
 		}
@@ -178,7 +178,7 @@ func (p *Processor) doComplCmd(meta Meta) error {
 
 	sentStr := ComplTasks + tasksStr
 
-	p.tg.SendMessage(int(meta.ChatId), sentStr)
+	p.tg.SendMessage(meta.ChatId, sentStr)
 	if err != nil {
 		return e.Wrap("can't do /compl", err)
 	}
@@ -190,7 +190,7 @@ func (p *Processor) adding1(text string, meta Meta) error {
 	const errMsg = "can't add title to task"
 
 	if text == "" {
-		err := p.tg.SendMessage(int(meta.ChatId), addingMsg+incorrectTitleMsg)
+		err := p.tg.SendMessage(meta.ChatId, addingMsg+incorrectTitleMsg)
 		if err != nil {
 			return e.Wrap(errMsg, err)
 		}
@@ -200,7 +200,7 @@ func (p *Processor) adding1(text string, meta Meta) error {
 
 	err := p.storage.UpdTitle(meta.UserId, text)
 	if errors.Is(err, storage.ErrUnique) {
-		if err := p.tg.SendMessage(int(meta.ChatId), addingMsg+taskAlreadyExistMsg); err != nil {
+		if err := p.tg.SendMessage(meta.ChatId, addingMsg+taskAlreadyExistMsg); err != nil {
 			return e.Wrap(errMsg, err)
 		}
 
@@ -213,7 +213,7 @@ func (p *Processor) adding1(text string, meta Meta) error {
 		return e.Wrap(errMsg, err)
 	}
 
-	if err := p.tg.SendMessage(int(meta.ChatId), addingMsg+successTitleSetMsg); err != nil {
+	if err := p.tg.SendMessage(meta.ChatId, addingMsg+successTitleSetMsg); err != nil {
 		return e.Wrap(errMsg, err)
 	}
 
@@ -230,7 +230,7 @@ func (p *Processor) adding2(text string, meta Meta) error {
 		return e.Wrap("can't add description to task", err)
 	}
 
-	if err := p.tg.SendMessage(int(meta.ChatId), successDescrSetMsg); err != nil {
+	if err := p.tg.SendMessage(meta.ChatId, successDescrSetMsg); err != nil {
 		return e.Wrap("can't add description to task", err)
 	}
 
