@@ -45,6 +45,13 @@ const (
 	closingSuccessClosed    = "✅ Задача успешно помечена как выполненная."
 )
 
+// Text for deleting task
+const (
+	deletingMsg           = "🗑 Удаление задачи:\n\n"
+	deletingTitleMsg      = "Введите название задачи, которую вы хотите удалить."
+	deletingSuccessDelete = "🗑 Задача успешно удалена."
+)
+
 func makeTasksString(tasks []storage.Task) string {
 	dateTimeFormat := "02-01-2006 15:04"
 

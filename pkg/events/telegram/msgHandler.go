@@ -44,6 +44,8 @@ func (p *Processor) handleMsg(text string, meta Meta) error {
 		err = p.adding3(text, meta)
 	case storage.Closing1:
 		err = p.closeTask(text, meta)
+	case storage.Deleting1:
+		err = p.deleteTask(text, meta)
 	}
 
 	if err != nil {
@@ -65,6 +67,8 @@ func (p *Processor) doCmd(text string, meta Meta) error {
 		err = p.doAddCmd(meta)
 	case CloseCmd:
 		err = p.doCloseCmd(meta)
+	case DelCmd:
+		err = p.doDelCmd(meta)
 	case UncomplCmd:
 		err = p.doUncomplCmd(meta)
 	case ComplCmd:
@@ -134,6 +138,20 @@ func (p *Processor) doCloseCmd(meta Meta) error {
 	err = p.tg.SendMessage(meta.ChatId, closingMsg+closingTitleMsg)
 	if err != nil {
 		return e.Wrap("can't do /add", err)
+	}
+
+	return nil
+}
+
+func (p *Processor) doDelCmd(meta Meta) error {
+	err := p.storage.SetState(meta.UserId, storage.Deleting1)
+	if err != nil {
+		return e.Wrap("can't do /delete", err)
+	}
+
+	err = p.tg.SendMessage(meta.ChatId, deletingMsg+deletingTitleMsg)
+	if err != nil {
+		return e.Wrap("can't do /delete", err)
 	}
 
 	return nil
@@ -320,4 +338,29 @@ func (p *Processor) closeTask(text string, meta Meta) error {
 	}
 
 	return nil
+}
+
+func (p *Processor) deleteTask(text string, meta Meta) error {
+	err := p.storage.SetState(meta.UserId, storage.DefState)
+	if err != nil {
+		return e.Wrap("can't delete task", err)
+	}
+
+	err = p.storage.Delete(meta.UserId, text)
+	if err == storage.ErrNotExist {
+		if err := p.tg.SendMessage(meta.ChatId, taskNotExistMsg); err != nil {
+			return e.Wrap("can't delete task", err)
+		}
+
+		return nil
+	} else if err != nil {
+		return e.Wrap("can't delete task", err)
+	}
+
+	if err := p.tg.SendMessage(meta.ChatId, deletingSuccessDelete); err != nil {
+		return e.Wrap("can't delete task", err)
+	}
+
+	return nil
+
 }
