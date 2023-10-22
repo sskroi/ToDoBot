@@ -6,6 +6,7 @@ import (
 
 type Storage interface {
 	GetState(userId uint64) (int, error)
+	SetState(userId uint64, state int) error
 	Add(userId uint64) error
 	UpdTitle(userId uint64, title string) error
 	UpdDescription(userId uint64, description string) error

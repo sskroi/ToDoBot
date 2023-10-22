@@ -78,6 +78,22 @@ func (s *SqliteStorage) GetState(userId uint64) (int, error) {
 	return userState, nil
 }
 
+func (s *SqliteStorage) SetState(userId uint64, state int) error {
+	err := s.checkUser(userId)
+	if err != nil {
+		return err
+	}
+
+	qForSetState := `UPDATE users SET state = ? WHERE user_id = ?;`
+
+	_, err = s.db.Exec(qForSetState, state, userId)
+	if err != nil {
+		return e.Wrap("can't set state for user", err)
+	}
+
+	return nil
+}
+
 // Add insert empty task in tasks table with specified UserId
 // and set the cur_task for the user with `userId` value of the newly created task.
 // Task add with NULL title, description, create_time and deadline.
