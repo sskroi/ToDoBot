@@ -188,7 +188,7 @@ func (p *Processor) adding1(text string, meta Meta) error {
 	const errMsg = "can't add title to task"
 
 	if text == "" {
-		err := p.tg.SendMessage(int(meta.ChatId), incorrectTitleMsg)
+		err := p.tg.SendMessage(int(meta.ChatId), addingMsg+incorrectTitleMsg)
 		if err != nil {
 			return e.Wrap(errMsg, err)
 		}
@@ -198,7 +198,7 @@ func (p *Processor) adding1(text string, meta Meta) error {
 
 	err := p.storage.UpdTitle(meta.UserId, text)
 	if errors.Is(err, storage.ErrUnique) {
-		if err := p.tg.SendMessage(int(meta.ChatId), taskAlreadyExistMsg); err != nil {
+		if err := p.tg.SendMessage(int(meta.ChatId), addingMsg+taskAlreadyExistMsg); err != nil {
 			return e.Wrap(errMsg, err)
 		}
 
@@ -211,7 +211,7 @@ func (p *Processor) adding1(text string, meta Meta) error {
 		return e.Wrap(errMsg, err)
 	}
 
-	if err := p.tg.SendMessage(int(meta.ChatId), successTitleSetMsg); err != nil {
+	if err := p.tg.SendMessage(int(meta.ChatId), addingMsg+successTitleSetMsg); err != nil {
 		return e.Wrap(errMsg, err)
 	}
 
