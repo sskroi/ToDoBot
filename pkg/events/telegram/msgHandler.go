@@ -3,6 +3,7 @@ package telegram
 import (
 	"ToDoBot1/pkg/e"
 	"ToDoBot1/pkg/storage"
+	"errors"
 	"fmt"
 	"log"
 	"strings"
@@ -31,7 +32,13 @@ func (p *Processor) handleMsg(text string, meta Meta) error {
 
 	switch userState {
 	case storage.DefState:
-		p.doCmd(text, meta)
+		err = p.doCmd(text, meta)
+	case storage.Adding1:
+		err = p.adding1(text, meta)
+	}
+
+	if err != nil {
+		return e.Wrap("can't handle message", err)
 	}
 
 	return nil
@@ -172,6 +179,40 @@ func (p *Processor) doComplCmd(meta Meta) error {
 	p.tg.SendMessage(int(meta.ChatId), sentStr)
 	if err != nil {
 		return e.Wrap("can't do /compl", err)
+	}
+
+	return nil
+}
+
+func (p *Processor) adding1(text string, meta Meta) error {
+	const errMsg = "can't add title to task"
+
+	if text == "" {
+		err := p.tg.SendMessage(int(meta.ChatId), incorrectTitleMsg)
+		if err != nil {
+			return e.Wrap(errMsg, err)
+		}
+
+		return nil
+	}
+
+	err := p.storage.UpdTitle(meta.UserId, text)
+	if errors.Is(err, storage.ErrUnique) {
+		if err := p.tg.SendMessage(int(meta.ChatId), taskAlreadyExistMsg); err != nil {
+			return e.Wrap(errMsg, err)
+		}
+
+		return nil
+	} else if err != nil {
+		return e.Wrap(errMsg, err)
+	}
+
+	if err := p.storage.SetState(meta.UserId, storage.Adding2); err != nil {
+		return e.Wrap(errMsg, err)
+	}
+
+	if err := p.tg.SendMessage(int(meta.ChatId), successTitleSetMsg); err != nil {
+		return e.Wrap(errMsg, err)
 	}
 
 	return nil
