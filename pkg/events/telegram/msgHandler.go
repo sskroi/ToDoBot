@@ -73,7 +73,7 @@ func (p *Processor) doUnknownCmd(meta Meta) error {
 }
 
 func (p *Processor) doStartCmd(meta Meta) error {
-	err := p.tg.SendMessage(int(meta.ChatId), "Введите /help для просмотра команд")
+	err := p.tg.SendMessage(int(meta.ChatId), startMsg)
 	if err != nil {
 		return e.Wrap("can't do /start", err)
 	}
@@ -129,11 +129,20 @@ func (p *Processor) doUncomplCmd(meta Meta) error {
 		return e.Wrap("can't do /uncompl", err)
 	}
 
+	if len(tasks) == 0 {
+		p.tg.SendMessage(int(meta.ChatId), noUncomplTasksMsg)
+		if err != nil {
+			return e.Wrap("can't do /uncompl", err)
+		}
+
+		return nil
+	}
+
 	tasksStr := makeTasksString(tasks)
 
-	s := "Не завершённые задачи:\n" + tasksStr
+	sentStr := UnComplTasksMsg + tasksStr
 
-	p.tg.SendMessage(int(meta.ChatId), s)
+	p.tg.SendMessage(int(meta.ChatId), sentStr)
 	if err != nil {
 		return e.Wrap("can't do /uncompl", err)
 	}
@@ -147,11 +156,20 @@ func (p *Processor) doComplCmd(meta Meta) error {
 		return e.Wrap("can't do /compl", err)
 	}
 
+	if len(tasks) == 0 {
+		p.tg.SendMessage(int(meta.ChatId), noComplTasksMsg)
+		if err != nil {
+			return e.Wrap("can't do /uncompl", err)
+		}
+
+		return nil
+	}
+
 	tasksStr := makeTasksString(tasks)
 
-	s := "Завершённые задачи:\n" + tasksStr
+	sentStr := ComplTasks + tasksStr
 
-	p.tg.SendMessage(int(meta.ChatId), s)
+	p.tg.SendMessage(int(meta.ChatId), sentStr)
 	if err != nil {
 		return e.Wrap("can't do /compl", err)
 	}
