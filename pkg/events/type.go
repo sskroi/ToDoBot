@@ -1,7 +1,7 @@
 package events
 
 type Fetcher interface {
-	Fetcher(limit int) ([]Event, error)
+	Fetch(limit int) ([]Event, error)
 }
 
 type Processor interface {
@@ -10,6 +10,7 @@ type Processor interface {
 
 type EvType int
 
+// Types of events
 const (
 	Unknown EvType = iota
 	Message
@@ -18,4 +19,5 @@ const (
 type Event struct {
 	Type EvType
 	Text string
+	Meta interface{}
 }
