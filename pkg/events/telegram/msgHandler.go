@@ -6,6 +6,11 @@ import (
 	"errors"
 	"log"
 	"strings"
+	"time"
+)
+
+var (
+	ErrIncorrectTimeFormat = errors.New("incorrect time format")
 )
 
 const (
@@ -35,6 +40,8 @@ func (p *Processor) handleMsg(text string, meta Meta) error {
 		err = p.adding1(text, meta)
 	case storage.Adding2:
 		err = p.adding2(text, meta)
+	case storage.Adding3:
+		err = p.adding3(text, meta)
 	}
 
 	if err != nil {
@@ -233,4 +240,52 @@ func (p *Processor) adding2(text string, meta Meta) error {
 	}
 
 	return nil
+}
+
+func (p *Processor) adding3(text string, meta Meta) error {
+	deadlineUnixTime, err := parseTime(text)
+	if err == ErrIncorrectTimeFormat {
+		if err := p.tg.SendMessage(meta.ChatId, incorrectDeadlineMsg); err != nil {
+			return e.Wrap("can't set deadline", err)
+		}
+
+		return nil
+	}
+
+	err = p.storage.UpdDeadline(meta.UserId, deadlineUnixTime, meta.Date)
+	if err != nil {
+		return e.Wrap("can't set deadline", err)
+	}
+
+	if err := p.storage.SetState(meta.UserId, storage.DefState); err != nil {
+		return e.Wrap("can't set deadline", err)
+	}
+
+	if err := p.tg.SendMessage(meta.UserId, successDeadlineMsg); err != nil {
+		return e.Wrap("can't set deadline", err)
+	}
+
+	return nil
+}
+
+func parseTime(text string) (uint64, error) {
+	location, err := time.LoadLocation("Europe/Moscow")
+	if err != nil {
+		return 0, e.Wrap("can't find location", err)
+	}
+
+	dateTimeFormat := "02-01-2006 15:04"
+
+	parsedTime, err := time.ParseInLocation(dateTimeFormat, text, location)
+	if err != nil {
+		return 0, ErrIncorrectTimeFormat
+	}
+
+	res := parsedTime.Unix()
+
+	if res <= time.Now().Unix() {
+		return 0, ErrIncorrectTimeFormat
+	}
+
+	return uint64(res), nil
 }
