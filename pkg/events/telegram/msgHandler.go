@@ -4,10 +4,8 @@ import (
 	"ToDoBot1/pkg/e"
 	"ToDoBot1/pkg/storage"
 	"errors"
-	"fmt"
 	"log"
 	"strings"
-	"time"
 )
 
 const (
@@ -235,21 +233,4 @@ func (p *Processor) adding2(text string, meta Meta) error {
 	}
 
 	return nil
-}
-
-func makeTasksString(tasks []storage.Task) string {
-	var res string = ""
-	for _, v := range tasks {
-		res += fmt.Sprintf("%s | Статус: %s | Описание: %s | Дедлайн: %s\n", v.Title, getDoneStatus(v.Done), v.Description, time.Unix(int64(v.Deadline), 0))
-	}
-
-	return res
-}
-
-func getDoneStatus(status bool) string {
-	if !status {
-		return "не завершена"
-	} else {
-		return "завершена"
-	}
 }

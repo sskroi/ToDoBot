@@ -1,5 +1,11 @@
 package telegram
 
+import (
+	"ToDoBot1/pkg/storage"
+	"fmt"
+	"time"
+)
+
 // Text for /help and /start cmd
 const (
 	helpMsg  = "/add - добавить задачу\n/close - завершить выполнение задачи\n/delete - удалить задачу\n/uncompl - посмотреть незавершенные задачи\n/compl - посмотреть завершенные задачи\n/help - список команд"
@@ -23,3 +29,20 @@ const (
 	addingTitleMsg      = "Введите уникальное название для новой задачи:"
 	successDescrSetMsg  = "Описание задачи успешно установлено.\n\nВведите дату дедлайна для новой задачи в формате ?:"
 )
+
+func makeTasksString(tasks []storage.Task) string {
+	var res string = ""
+	for _, v := range tasks {
+		res += fmt.Sprintf("%s | Статус: %s | Описание: %s | Дедлайн: %s\n", v.Title, getDoneStatus(v.Done), v.Description, time.Unix(int64(v.Deadline), 0))
+	}
+
+	return res
+}
+
+func getDoneStatus(status bool) string {
+	if !status {
+		return "не завершена"
+	} else {
+		return "завершена"
+	}
+}
