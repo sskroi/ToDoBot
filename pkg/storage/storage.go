@@ -28,7 +28,7 @@ const (
 )
 
 var (
-	ErrUnique      = errors.New("unique error")
+	ErrUnique       = errors.New("unique error")
 	ErrNotExist     = errors.New("requested data does not exist")
 	ErrAlreayClosed = errors.New("task alreay closed")
 )

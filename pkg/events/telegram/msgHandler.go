@@ -42,6 +42,8 @@ func (p *Processor) handleMsg(text string, meta Meta) error {
 		err = p.adding2(text, meta)
 	case storage.Adding3:
 		err = p.adding3(text, meta)
+	case storage.Closing1:
+		err = p.closeTask(text, meta)
 	}
 
 	if err != nil {
@@ -78,7 +80,7 @@ func (p *Processor) doCmd(text string, meta Meta) error {
 }
 
 func (p *Processor) doUnknownCmd(meta Meta) error {
-	err := p.tg.SendMessage(meta.ChatId, "Неизвестная комманда. /help - для просмотра доступных команд.")
+	err := p.tg.SendMessage(meta.ChatId, unknownCmdMsg)
 	if err != nil {
 		return e.Wrap("can't do UnknownCmd", err)
 	}
@@ -115,7 +117,7 @@ func (p *Processor) doAddCmd(meta Meta) error {
 		return e.Wrap("can't do /add", err)
 	}
 
-	err = p.tg.SendMessage(meta.ChatId, "Добавление задачи -> введите уникальное название:")
+	err = p.tg.SendMessage(meta.ChatId, addingMsg+addingTitleMsg)
 	if err != nil {
 		return e.Wrap("can't do /add", err)
 	}
@@ -129,7 +131,7 @@ func (p *Processor) doCloseCmd(meta Meta) error {
 		return e.Wrap("can't do /close", err)
 	}
 
-	err = p.tg.SendMessage(meta.ChatId, "Завершение задачи -> введите название задачи:")
+	err = p.tg.SendMessage(meta.ChatId, closingMsg+closingTitleMsg)
 	if err != nil {
 		return e.Wrap("can't do /add", err)
 	}
@@ -288,4 +290,34 @@ func parseTime(text string) (uint64, error) {
 	}
 
 	return uint64(res), nil
+}
+
+func (p *Processor) closeTask(text string, meta Meta) error {
+	err := p.storage.SetState(meta.UserId, storage.DefState)
+	if err != nil {
+		return e.Wrap("can't close task", err)
+	}
+
+	err = p.storage.CloseTask(meta.UserId, text)
+	if err == storage.ErrNotExist || err == storage.ErrAlreayClosed {
+		if err == storage.ErrNotExist {
+			if err := p.tg.SendMessage(meta.ChatId, taskNotExistMsg); err != nil {
+				return e.Wrap("can't close task", err)
+			}
+		} else if err == storage.ErrAlreayClosed {
+			if err := p.tg.SendMessage(meta.ChatId, closingAlreadyClosedMsg); err != nil {
+				return e.Wrap("can't close task", err)
+			}
+		}
+
+		return nil
+	} else if err != nil {
+		return e.Wrap("can't close task", err)
+	}
+
+	if err := p.tg.SendMessage(meta.ChatId, closingSuccessClosed); err != nil {
+		return e.Wrap("can't close task", err)
+	}
+
+	return nil
 }
