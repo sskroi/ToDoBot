@@ -255,7 +255,7 @@ func (p *Processor) adding2(text string, meta Meta) error {
 		return e.Wrap("can't add description to task", err)
 	}
 
-	if err := p.tg.SendMessage(meta.ChatId, successDescrSetMsg); err != nil {
+	if err := p.tg.SendMessage(meta.ChatId, addingMsg+successDescrSetMsg); err != nil {
 		return e.Wrap("can't add description to task", err)
 	}
 
@@ -265,7 +265,7 @@ func (p *Processor) adding2(text string, meta Meta) error {
 func (p *Processor) adding3(text string, meta Meta) error {
 	deadlineUnixTime, err := parseTime(text)
 	if err == ErrIncorrectTimeFormat {
-		if err := p.tg.SendMessage(meta.ChatId, incorrectDeadlineMsg); err != nil {
+		if err := p.tg.SendMessage(meta.ChatId, addingMsg+incorrectDeadlineMsg); err != nil {
 			return e.Wrap("can't set deadline", err)
 		}
 
