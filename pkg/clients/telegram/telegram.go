@@ -50,9 +50,9 @@ func (c *Client) Updates(offset int, limit int) ([]Update, error) {
 	return res.Result, nil
 }
 
-func (c *Client) SendMessage(chatID int, text string) error {
+func (c *Client) SendMessage(chatId uint64, text string) error {
 	querryParams := url.Values{}
-	querryParams.Add("chat_id", strconv.Itoa(chatID))
+	querryParams.Add("chat_id", strconv.FormatUint(chatId, 10))
 	querryParams.Add("text", text)
 
 	_, err := c.doRequest(sendMessageMethod, querryParams)
