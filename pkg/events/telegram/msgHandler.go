@@ -5,6 +5,7 @@ import (
 	"ToDoBot1/pkg/storage"
 	"errors"
 	"log"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -26,7 +27,7 @@ const (
 func (p *Processor) handleMsg(text string, meta Meta) error {
 	text = strings.TrimSpace(text)
 
-	log.Printf("got new messgae: %s | from: %s", text, meta.Username)
+	log.Printf("new msg: %s | username: %s | user_id: %s | chat_id: %s\n", text, meta.Username, strconv.FormatUint(meta.UserId, 10), strconv.FormatUint(meta.ChatId, 10))
 
 	userState, err := p.storage.GetState(meta.UserId)
 	if err != nil {
