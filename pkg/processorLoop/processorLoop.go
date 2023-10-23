@@ -44,7 +44,7 @@ func (p *ProcessorLoop) Start() error {
 
 func (p *ProcessorLoop) handleEvents(events []events.Event) error {
 	for _, event := range events {
-		log.Printf("got new event: %s", event.Text)
+		// log.Printf("got new event: %s", event.Text)
 
 		err := p.processor.Process(event)
 		if err != nil {
