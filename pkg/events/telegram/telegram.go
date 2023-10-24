@@ -61,7 +61,7 @@ func (p *Processor) Process(event events.Event) error {
 	case events.Message:
 		err = p.processMessage(event)
 	default:
-		return e.Wrap("can't process message", ErrUnknownEventType)
+		return e.Wrap("can't process events", ErrUnknownEventType)
 	}
 
 	if err != nil {
