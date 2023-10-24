@@ -1,10 +1,21 @@
 package telegram
 
 import (
+	"ToDoBot1/pkg/clients/telegram"
 	"ToDoBot1/pkg/storage"
 	"fmt"
 	"time"
 	"unicode/utf8"
+)
+
+const (
+	helpCmd    = "/help"
+	startCmd   = "/start"
+	addCmd     = "/add"
+	closeCmd   = "/close"
+	uncomplCmd = "/uncompl"
+	complCmd   = "/compl"
+	delCmd     = "/delete"
 )
 
 /*
@@ -62,6 +73,24 @@ const (
 	deletingTitleMsg      = "📝 Введите название задачи, которую вы хотите удалить"
 	deletingSuccessDelete = "✅ Задача успешно удалена."
 )
+
+// Text for main menu buttons
+const (
+	uncomplTasksBtn = "📌 Незавершённые задачи"
+
+	closeTaskBtn = "☑️ Завершить задачу"
+	addTaskBtn   = "➕ Добавить задачу"
+
+	complTasksBtn = "📊 Завёрш. задачи"
+	delTaskBtn    = "🗑 Удалить задачу"
+)
+
+// reply markup keyboard main menu var
+var mainMenuBtns = telegram.NewReplyKeyboard([][]string{
+	{uncomplTasksBtn},
+	{closeTaskBtn, addTaskBtn},
+	{complTasksBtn, delTaskBtn},
+})
 
 func makeTasksString(tasks []storage.Task) string {
 	dateTimeFormat := "02-01-2006 15:04"
