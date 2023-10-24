@@ -42,6 +42,6 @@ func NewReplyKeyboard(buttons [][]string) *ReplyKeyboardMarkup {
 	return &ReplyKeyboardMarkup{
 		Keyboard:        buttons,
 		ResizeKeyboard:  true,
-		OneTimeKeyboard: true,
+		OneTimeKeyboard: false,
 	}
 }
