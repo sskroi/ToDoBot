@@ -25,3 +25,13 @@ type From struct {
 type Chat struct {
 	ChatId uint64 `json:"id"`
 }
+
+type ReplyKeyboardMarkup struct {
+	Keyboard [][]string `json:"keyboard"`
+}
+
+func NewReplyKeyboard(buttons [][]string) *ReplyKeyboardMarkup {
+	return &ReplyKeyboardMarkup{
+		Keyboard: buttons,
+	}
+}
