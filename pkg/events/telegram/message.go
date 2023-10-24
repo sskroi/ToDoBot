@@ -42,8 +42,10 @@ const (
 const (
 	noUncomplTasksMsg = "📌 У вас нет незавершённых задач."
 	noComplTasksMsg   = "📌 У вас нет завершённых задач."
+	noTasks           = "📌 У вас нет никаких задач."
 	UnComplTasksMsg   = "⤵️ Список незавершённых задач:\n\n"
 	ComplTasks        = "⤵️ Список завершённых задач:\n\n"
+	allTasksMsg       = "⤵️ Список всех задач:\n\n"
 	taskNotExistMsg   = "❌ Задачи с таким названием не существует."
 )
 
@@ -56,7 +58,7 @@ const (
 	successTitleSetMsg   = "✅ Название успешно установлено.\n\n📝 Введите описание задачи\n\n📌 Если длина описания будет меньше двух символов, то описание не будет отображаться в списках задач."
 	successDescrSetMsg   = "✅ Описание задачи успешно установлено.\n\n📝 Введите дату дедлайна для новой задачи в формате\n\n\"ДД-ММ-ГГГГ ЧЧ:ММ\""
 	incorrectDeadlineMsg = "❌ Некорректный формат времени.\n🔄 Попробуйте снова\n\n📝 Введите дату дедлайна для новой задачи в формате:\n\n\"ДД-ММ-ГГГГ ЧЧ:ММ\""
-	successDeadlineMsg   = "✅ Задача успешно добавлена.\n\n/uncompl - для просмотра незавершённых задач"
+	successDeadlineMsg   = "✅ Задача успешно добавлена."
 )
 
 // Text for closing task
@@ -76,20 +78,23 @@ const (
 
 // Text for main menu buttons
 const (
-	uncomplTasksBtn = "📌 Незавершённые задачи"
+	uncomplTasksBtn = "📌 Uncompleted tasks"
 
-	closeTaskBtn = "☑️ Завершить задачу"
-	addTaskBtn   = "➕ Добавить задачу"
+	closeTaskBtn = "✅ Complete task"
 
-	complTasksBtn = "📊 Завёрш. задачи"
-	delTaskBtn    = "🗑 Удалить задачу"
+	addTaskBtn = "➕ Add task"
+	delTaskBtn = "🗑 Delete task"
+
+	allTasksBtn   = "📊 All tasks"
+	complTasksBtn = "☑️ Compl. tasks"
 )
 
 // reply markup keyboard main menu var
 var mainMenuBtns = telegram.NewReplyKeyboard([][]string{
 	{uncomplTasksBtn},
-	{closeTaskBtn, addTaskBtn},
-	{complTasksBtn, delTaskBtn},
+	{closeTaskBtn},
+	{addTaskBtn, delTaskBtn},
+	{allTasksBtn, complTasksBtn},
 })
 
 func makeTasksString(tasks []storage.Task) string {
