@@ -26,6 +26,12 @@ type Chat struct {
 	ChatId uint64 `json:"id"`
 }
 
+var ReplyKeyboardRemove = struct {
+	Remove_keyboard bool `json:"remove_keyboard"`
+}{
+	true,
+}
+
 type ReplyKeyboardMarkup struct {
 	Keyboard [][]string `json:"keyboard"`
 }
