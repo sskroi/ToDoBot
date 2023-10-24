@@ -39,6 +39,8 @@ func (p *ProcessorLoop) Start() error {
 
 			continue
 		}
+
+		time.Sleep(time.Millisecond * 50)
 	}
 }
 
