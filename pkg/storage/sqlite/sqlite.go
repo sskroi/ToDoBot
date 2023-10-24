@@ -256,6 +256,16 @@ func (s *SqliteStorage) Compl(userId uint64) ([]storage.Task, error) {
 	return tasks, nil
 }
 
+// AllTasks returns slice of all user's tasks ordered by create time
+func (s *SqliteStorage) AllTasks(userId uint64) ([]storage.Task, error) {
+	tasks, err := s.getTasks(userId, 2)
+	if err != nil {
+		return nil, err
+	}
+
+	return tasks, nil
+}
+
 // getTask returns slice of uncompleted tasks for user if qFilter = 0
 // and slice of completed tasks if qFilter = 1.
 func (s *SqliteStorage) getTasks(userId uint64, qFilter int) ([]storage.Task, error) {
@@ -268,6 +278,9 @@ func (s *SqliteStorage) getTasks(userId uint64, qFilter int) ([]storage.Task, er
 	case 1:
 		qForGetTasks =
 			`SELECT * FROM tasks WHERE user_id = ? AND done = 1;`
+	case 2:
+		qForGetTasks =
+			`SELECT * FROM tasks WHERE user_id = ? ORDER BY create_time DESC`
 	default:
 		return nil, errors.New("unknown qFilter")
 	}
