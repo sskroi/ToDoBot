@@ -1,6 +1,7 @@
 package telegram
 
 import (
+	"ToDoBot1/pkg/clients/telegram"
 	"ToDoBot1/pkg/e"
 	"ToDoBot1/pkg/storage"
 	"errors"
@@ -12,16 +13,6 @@ import (
 
 var (
 	ErrIncorrectTimeFormat = errors.New("incorrect time format")
-)
-
-const (
-	HelpCmd    = "/help"
-	StartCmd   = "/start"
-	AddCmd     = "/add"
-	CloseCmd   = "/close"
-	UncomplCmd = "/uncompl"
-	ComplCmd   = "/compl"
-	DelCmd     = "/delete"
 )
 
 func (p *Processor) handleMsg(text string, meta Meta) error {
@@ -60,19 +51,19 @@ func (p *Processor) doCmd(text string, meta Meta) error {
 	var err error
 
 	switch text {
-	case StartCmd:
+	case startCmd:
 		err = p.doStartCmd(meta)
-	case HelpCmd:
+	case helpCmd:
 		err = p.doHelpCmd(meta)
-	case AddCmd:
+	case addCmd, addTaskBtn:
 		err = p.doAddCmd(meta)
-	case CloseCmd:
+	case closeCmd, closeTaskBtn:
 		err = p.doCloseCmd(meta)
-	case DelCmd:
+	case delCmd, delTaskBtn:
 		err = p.doDelCmd(meta)
-	case UncomplCmd:
+	case uncomplCmd, uncomplTasksBtn:
 		err = p.doUncomplCmd(meta)
-	case ComplCmd:
+	case complCmd, complTasksBtn:
 		err = p.doComplCmd(meta)
 	default:
 		err = p.doUnknownCmd(meta)
@@ -85,7 +76,7 @@ func (p *Processor) doCmd(text string, meta Meta) error {
 }
 
 func (p *Processor) doUnknownCmd(meta Meta) error {
-	err := p.tg.SendMessage(meta.ChatId, unknownCmdMsg)
+	err := p.tg.SendMessageRM(meta.ChatId, unknownCmdMsg, mainMenuBtns)
 	if err != nil {
 		return e.Wrap("can't do UnknownCmd", err)
 	}
@@ -94,7 +85,7 @@ func (p *Processor) doUnknownCmd(meta Meta) error {
 }
 
 func (p *Processor) doStartCmd(meta Meta) error {
-	err := p.tg.SendMessage(meta.ChatId, startMsg)
+	err := p.tg.SendMessageRM(meta.ChatId, startMsg, mainMenuBtns)
 	if err != nil {
 		return e.Wrap("can't do /start", err)
 	}
@@ -103,7 +94,7 @@ func (p *Processor) doStartCmd(meta Meta) error {
 }
 
 func (p *Processor) doHelpCmd(meta Meta) error {
-	err := p.tg.SendMessage(meta.ChatId, helpMsg)
+	err := p.tg.SendMessageRM(meta.ChatId, helpMsg, mainMenuBtns)
 	if err != nil {
 		return e.Wrap("can't do /help", err)
 	}
@@ -122,7 +113,7 @@ func (p *Processor) doAddCmd(meta Meta) error {
 		return e.Wrap("can't do /add", err)
 	}
 
-	err = p.tg.SendMessage(meta.ChatId, addingMsg+addingTitleMsg)
+	err = p.tg.SendMessageRM(meta.ChatId, addingMsg+addingTitleMsg, telegram.ReplyKeyboardRemove)
 	if err != nil {
 		return e.Wrap("can't do /add", err)
 	}
@@ -136,7 +127,7 @@ func (p *Processor) doCloseCmd(meta Meta) error {
 		return e.Wrap("can't do /close", err)
 	}
 
-	err = p.tg.SendMessage(meta.ChatId, closingMsg+closingTitleMsg)
+	err = p.tg.SendMessageRM(meta.ChatId, closingMsg+closingTitleMsg, telegram.ReplyKeyboardRemove)
 	if err != nil {
 		return e.Wrap("can't do /add", err)
 	}
@@ -150,7 +141,7 @@ func (p *Processor) doDelCmd(meta Meta) error {
 		return e.Wrap("can't do /delete", err)
 	}
 
-	err = p.tg.SendMessage(meta.ChatId, deletingMsg+deletingTitleMsg)
+	err = p.tg.SendMessageRM(meta.ChatId, deletingMsg+deletingTitleMsg, telegram.ReplyKeyboardRemove)
 	if err != nil {
 		return e.Wrap("can't do /delete", err)
 	}
@@ -165,7 +156,7 @@ func (p *Processor) doUncomplCmd(meta Meta) error {
 	}
 
 	if len(tasks) == 0 {
-		p.tg.SendMessage(meta.ChatId, noUncomplTasksMsg)
+		p.tg.SendMessageRM(meta.ChatId, noUncomplTasksMsg, mainMenuBtns)
 		if err != nil {
 			return e.Wrap("can't do /uncompl", err)
 		}
@@ -177,7 +168,7 @@ func (p *Processor) doUncomplCmd(meta Meta) error {
 
 	sentStr := UnComplTasksMsg + tasksStr
 
-	p.tg.SendMessage(meta.ChatId, sentStr)
+	p.tg.SendMessageRM(meta.ChatId, sentStr, mainMenuBtns)
 	if err != nil {
 		return e.Wrap("can't do /uncompl", err)
 	}
@@ -192,7 +183,7 @@ func (p *Processor) doComplCmd(meta Meta) error {
 	}
 
 	if len(tasks) == 0 {
-		p.tg.SendMessage(meta.ChatId, noComplTasksMsg)
+		p.tg.SendMessageRM(meta.ChatId, noComplTasksMsg, mainMenuBtns)
 		if err != nil {
 			return e.Wrap("can't do /uncompl", err)
 		}
@@ -204,7 +195,7 @@ func (p *Processor) doComplCmd(meta Meta) error {
 
 	sentStr := ComplTasks + tasksStr
 
-	p.tg.SendMessage(meta.ChatId, sentStr)
+	p.tg.SendMessageRM(meta.ChatId, sentStr, mainMenuBtns)
 	if err != nil {
 		return e.Wrap("can't do /compl", err)
 	}
@@ -282,7 +273,7 @@ func (p *Processor) adding3(text string, meta Meta) error {
 		return e.Wrap("can't set deadline", err)
 	}
 
-	if err := p.tg.SendMessage(meta.UserId, successDeadlineMsg); err != nil {
+	if err := p.tg.SendMessageRM(meta.UserId, successDeadlineMsg, mainMenuBtns); err != nil {
 		return e.Wrap("can't set deadline", err)
 	}
 
@@ -320,11 +311,11 @@ func (p *Processor) closeTask(text string, meta Meta) error {
 	err = p.storage.CloseTask(meta.UserId, text)
 	if err == storage.ErrNotExist || err == storage.ErrAlreayClosed {
 		if err == storage.ErrNotExist {
-			if err := p.tg.SendMessage(meta.ChatId, taskNotExistMsg); err != nil {
+			if err := p.tg.SendMessageRM(meta.ChatId, taskNotExistMsg, mainMenuBtns); err != nil {
 				return e.Wrap("can't close task", err)
 			}
 		} else if err == storage.ErrAlreayClosed {
-			if err := p.tg.SendMessage(meta.ChatId, closingAlreadyClosedMsg); err != nil {
+			if err := p.tg.SendMessageRM(meta.ChatId, closingAlreadyClosedMsg, mainMenuBtns); err != nil {
 				return e.Wrap("can't close task", err)
 			}
 		}
@@ -334,7 +325,7 @@ func (p *Processor) closeTask(text string, meta Meta) error {
 		return e.Wrap("can't close task", err)
 	}
 
-	if err := p.tg.SendMessage(meta.ChatId, closingSuccessClosed); err != nil {
+	if err := p.tg.SendMessageRM(meta.ChatId, closingSuccessClosed, mainMenuBtns); err != nil {
 		return e.Wrap("can't close task", err)
 	}
 
@@ -349,7 +340,7 @@ func (p *Processor) deleteTask(text string, meta Meta) error {
 
 	err = p.storage.Delete(meta.UserId, text)
 	if err == storage.ErrNotExist {
-		if err := p.tg.SendMessage(meta.ChatId, taskNotExistMsg); err != nil {
+		if err := p.tg.SendMessageRM(meta.ChatId, taskNotExistMsg, mainMenuBtns); err != nil {
 			return e.Wrap("can't delete task", err)
 		}
 
@@ -358,7 +349,7 @@ func (p *Processor) deleteTask(text string, meta Meta) error {
 		return e.Wrap("can't delete task", err)
 	}
 
-	if err := p.tg.SendMessage(meta.ChatId, deletingSuccessDelete); err != nil {
+	if err := p.tg.SendMessageRM(meta.ChatId, deletingSuccessDelete, mainMenuBtns); err != nil {
 		return e.Wrap("can't delete task", err)
 	}
 
