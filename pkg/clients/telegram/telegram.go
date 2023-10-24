@@ -51,11 +51,38 @@ func (c *Client) Updates(offset int, limit int) ([]Update, error) {
 }
 
 func (c *Client) SendMessage(chatId uint64, text string) error {
+	err := c.sendMessage(chatId, text, nil)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c *Client) SendMessageReplyMarup(chatId uint64, text string, replyMarkup *ReplyKeyboardMarkup) error {
+	err := c.sendMessage(chatId, text, replyMarkup)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c *Client) sendMessage(chatId uint64, text string, replyMarkup *ReplyKeyboardMarkup) error {
 	querryParams := url.Values{}
 	querryParams.Add("chat_id", strconv.FormatUint(chatId, 10))
 	querryParams.Add("text", text)
 
 	querryParams.Add("parse_mode", "HTML")
+
+	if replyMarkup != nil {
+		serializedReplyMarkup, err := json.Marshal(replyMarkup)
+		if err != nil {
+			return e.Wrap("can't send message", err)
+		}
+
+		querryParams.Add("reply_markup", string(serializedReplyMarkup))
+	}
 
 	_, err := c.doRequest(sendMessageMethod, querryParams)
 	if err != nil {
