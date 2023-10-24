@@ -59,7 +59,8 @@ func (c *Client) SendMessage(chatId uint64, text string) error {
 	return nil
 }
 
-func (c *Client) SendMessageReplyMarup(chatId uint64, text string, replyMarkup *ReplyKeyboardMarkup) error {
+// SendMessageRM sens message with `reply_markup` parameter
+func (c *Client) SendMessageRM(chatId uint64, text string, replyMarkup interface{}) error {
 	err := c.sendMessage(chatId, text, replyMarkup)
 	if err != nil {
 		return err
@@ -68,7 +69,7 @@ func (c *Client) SendMessageReplyMarup(chatId uint64, text string, replyMarkup *
 	return nil
 }
 
-func (c *Client) sendMessage(chatId uint64, text string, replyMarkup *ReplyKeyboardMarkup) error {
+func (c *Client) sendMessage(chatId uint64, text string, replyMarkup interface{}) error {
 	querryParams := url.Values{}
 	querryParams.Add("chat_id", strconv.FormatUint(chatId, 10))
 	querryParams.Add("text", text)
