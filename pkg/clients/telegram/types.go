@@ -26,18 +26,22 @@ type Chat struct {
 	ChatId uint64 `json:"id"`
 }
 
-var ReplyKeyboardRemove = struct {
-	Remove_keyboard bool `json:"remove_keyboard"`
+var ReplyKeyboardRemove = &struct {
+	RemoveKeyboard bool `json:"remove_keyboard"`
 }{
 	true,
 }
 
 type ReplyKeyboardMarkup struct {
-	Keyboard [][]string `json:"keyboard"`
+	Keyboard        [][]string `json:"keyboard"`
+	ResizeKeyboard  bool       `json:"resize_keyboard"`
+	OneTimeKeyboard bool       `json:"one_time_keyboard"`
 }
 
 func NewReplyKeyboard(buttons [][]string) *ReplyKeyboardMarkup {
 	return &ReplyKeyboardMarkup{
-		Keyboard: buttons,
+		Keyboard:        buttons,
+		ResizeKeyboard:  true,
+		OneTimeKeyboard: true,
 	}
 }
