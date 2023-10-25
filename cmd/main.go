@@ -16,7 +16,7 @@ const (
 
 func main() {
 	// создание объекта для взаимодействия с api телеграма
-	tgClient := tgClient.New(tgBotHost, mustToken())
+	tgClient_ := tgClient.New(tgBotHost, mustToken())
 	storage, err := sqlite.New(storagePath)
 	if err != nil {
 		log.Fatalf("can't connect to storage: %s", err.Error())
@@ -27,7 +27,7 @@ func main() {
 		log.Fatalf("can't init storage: %s", err.Error())
 	}
 
-	processor := telegram.New(&tgClient, storage)
+	processor := telegram.New(&tgClient_, storage)
 
 	mainLoop := processorloop.New(processor, 100)
 	err = mainLoop.Start()
