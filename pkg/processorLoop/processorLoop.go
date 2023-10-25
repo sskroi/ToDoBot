@@ -28,7 +28,7 @@ func (p *ProcessorLoop) Start() error {
 		}
 
 		if len(gotEvents) == 0 {
-			time.Sleep(1 * time.Second)
+			time.Sleep(time.Millisecond * 50)
 
 			continue
 		}
