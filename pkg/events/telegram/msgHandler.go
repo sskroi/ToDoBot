@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode/utf8"
 )
 
 var (
@@ -315,7 +316,11 @@ func parseTime(text string) (uint64, error) {
 		return 0, e.Wrap("can't find location", err)
 	}
 
-	dateTimeFormat := "02-01-2006 15:04"
+	text = strings.TrimSpace(text)
+
+	if utf8.RuneCount([]byte(text)) <= 10 {
+		text = text + " 23:59"
+	}
 
 	parsedTime, err := time.ParseInLocation(dateTimeFormat, text, location)
 	if err != nil {
