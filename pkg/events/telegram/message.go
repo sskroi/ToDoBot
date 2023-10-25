@@ -8,15 +8,10 @@ import (
 	"unicode/utf8"
 )
 
+// Text for cmds
 const (
 	helpCmd     = "/help"
 	startCmd    = "/start"
-	addCmd      = "/add"
-	closeCmd    = "/close"
-	uncomplCmd  = "/uncompl"
-	complCmd    = "/compl"
-	delCmd      = "/delete"
-	allTasksCmd = "/alltasks"
 )
 
 /*

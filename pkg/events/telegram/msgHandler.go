@@ -55,17 +55,17 @@ func (p *Processor) doCmd(text string, meta Meta) error {
 		err = p.doStartCmd(meta)
 	case helpCmd:
 		err = p.doHelpCmd(meta)
-	case addCmd, addTaskBtn:
+	case addTaskBtn:
 		err = p.doAddCmd(meta)
-	case closeCmd, closeTaskBtn:
+	case closeTaskBtn:
 		err = p.doCloseCmd(meta)
-	case delCmd, delTaskBtn:
+	case delTaskBtn:
 		err = p.doDelCmd(meta)
-	case uncomplCmd, uncomplTasksBtn:
+	case uncomplTasksBtn:
 		err = p.doUncomplCmd(meta)
-	case complCmd, complTasksBtn:
+	case complTasksBtn:
 		err = p.doComplCmd(meta)
-	case allTasksCmd, allTasksBtn:
+	case allTasksBtn:
 		err = p.doAllTasksCmd(meta)
 	default:
 		err = p.doUnknownCmd(meta)
@@ -107,17 +107,17 @@ func (p *Processor) doHelpCmd(meta Meta) error {
 func (p *Processor) doAddCmd(meta Meta) error {
 	err := p.storage.Add(meta.UserId)
 	if err != nil {
-		return e.Wrap("can't do /add", err)
+		return e.Wrap("can't do addCmd", err)
 	}
 
 	err = p.storage.SetState(meta.UserId, storage.Adding1)
 	if err != nil {
-		return e.Wrap("can't do /add", err)
+		return e.Wrap("can't do addCmd", err)
 	}
 
 	err = p.tg.SendMessageRM(meta.ChatId, addingMsg+addingTitleMsg, telegram.ReplyKeyboardRemove)
 	if err != nil {
-		return e.Wrap("can't do /add", err)
+		return e.Wrap("can't do addCmd", err)
 	}
 
 	return nil
@@ -126,12 +126,12 @@ func (p *Processor) doAddCmd(meta Meta) error {
 func (p *Processor) doCloseCmd(meta Meta) error {
 	err := p.storage.SetState(meta.UserId, storage.Closing1)
 	if err != nil {
-		return e.Wrap("can't do /close", err)
+		return e.Wrap("can't do closeCmd", err)
 	}
 
 	err = p.tg.SendMessageRM(meta.ChatId, closingMsg+closingTitleMsg, telegram.ReplyKeyboardRemove)
 	if err != nil {
-		return e.Wrap("can't do /add", err)
+		return e.Wrap("can't do closeCmd", err)
 	}
 
 	return nil
@@ -140,12 +140,12 @@ func (p *Processor) doCloseCmd(meta Meta) error {
 func (p *Processor) doDelCmd(meta Meta) error {
 	err := p.storage.SetState(meta.UserId, storage.Deleting1)
 	if err != nil {
-		return e.Wrap("can't do /delete", err)
+		return e.Wrap("can't do deleteCmd", err)
 	}
 
 	err = p.tg.SendMessageRM(meta.ChatId, deletingMsg+deletingTitleMsg, telegram.ReplyKeyboardRemove)
 	if err != nil {
-		return e.Wrap("can't do /delete", err)
+		return e.Wrap("can't do deleteCmd", err)
 	}
 
 	return nil
@@ -154,13 +154,13 @@ func (p *Processor) doDelCmd(meta Meta) error {
 func (p *Processor) doUncomplCmd(meta Meta) error {
 	tasks, err := p.storage.Uncompl(meta.UserId)
 	if err != nil {
-		return e.Wrap("can't do /uncompl", err)
+		return e.Wrap("can't do uncomplCmd", err)
 	}
 
 	if len(tasks) == 0 {
 		p.tg.SendMessageRM(meta.ChatId, noUncomplTasksMsg, mainMenuBtns)
 		if err != nil {
-			return e.Wrap("can't do /uncompl", err)
+			return e.Wrap("can't do uncomplCmd", err)
 		}
 
 		return nil
@@ -172,7 +172,7 @@ func (p *Processor) doUncomplCmd(meta Meta) error {
 
 	p.tg.SendMessageRM(meta.ChatId, sentStr, mainMenuBtns)
 	if err != nil {
-		return e.Wrap("can't do /uncompl", err)
+		return e.Wrap("can't do uncomplCmd", err)
 	}
 
 	return nil
@@ -181,13 +181,13 @@ func (p *Processor) doUncomplCmd(meta Meta) error {
 func (p *Processor) doComplCmd(meta Meta) error {
 	tasks, err := p.storage.Compl(meta.UserId)
 	if err != nil {
-		return e.Wrap("can't do /compl", err)
+		return e.Wrap("can't do complCmd", err)
 	}
 
 	if len(tasks) == 0 {
 		p.tg.SendMessageRM(meta.ChatId, noComplTasksMsg, mainMenuBtns)
 		if err != nil {
-			return e.Wrap("can't do /uncompl", err)
+			return e.Wrap("can't do complCmd", err)
 		}
 
 		return nil
@@ -199,7 +199,7 @@ func (p *Processor) doComplCmd(meta Meta) error {
 
 	p.tg.SendMessageRM(meta.ChatId, sentStr, mainMenuBtns)
 	if err != nil {
-		return e.Wrap("can't do /compl", err)
+		return e.Wrap("can't do complCmd", err)
 	}
 
 	return nil
@@ -208,13 +208,13 @@ func (p *Processor) doComplCmd(meta Meta) error {
 func (p *Processor) doAllTasksCmd(meta Meta) error {
 	tasks, err := p.storage.AllTasks(meta.UserId)
 	if err != nil {
-		return e.Wrap("can't do /alltasks", err)
+		return e.Wrap("can't do alltasksCmd", err)
 	}
 
 	if len(tasks) == 0 {
 		p.tg.SendMessageRM(meta.ChatId, noTasksMsg, mainMenuBtns)
 		if err != nil {
-			return e.Wrap("can't do /alltasks", err)
+			return e.Wrap("can't do alltasksCmd", err)
 		}
 
 		return nil
@@ -226,7 +226,7 @@ func (p *Processor) doAllTasksCmd(meta Meta) error {
 
 	p.tg.SendMessageRM(meta.ChatId, sentStr, mainMenuBtns)
 	if err != nil {
-		return e.Wrap("can't do /alltasks", err)
+		return e.Wrap("can't do alltasksCmd", err)
 	}
 
 	return nil
