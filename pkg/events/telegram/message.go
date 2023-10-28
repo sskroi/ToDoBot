@@ -67,8 +67,8 @@ const (
 	addTaskBtn = "➕ Add task"
 	delTaskBtn = "🗑 Delete task"
 
-	complTasksBtn = "☑️ compl."
-	configTimeBtn = "⚙️ config."
+	complTasksBtn = "🗄 Completed"
+	configBtn     = "⚙️ Configure"
 )
 
 // reply markup keyboard main menu var
@@ -76,7 +76,7 @@ var mainMenuBtns = telegram.NewReplyKeyboard([][]string{
 	{uncomplTasksBtn},
 	{closeTaskBtn},
 	{addTaskBtn, delTaskBtn},
-	{complTasksBtn, configTimeBtn},
+	{complTasksBtn, configBtn},
 })
 
 const (
