@@ -66,8 +66,6 @@ func (p *Processor) doCmd(text string, meta Meta) error {
 		err = p.doUncomplCmd(meta)
 	case complTasksBtn:
 		err = p.doComplCmd(meta)
-	case allTasksBtn:
-		err = p.doAllTasksCmd(meta)
 	default:
 		err = p.doUnknownCmd(meta)
 	}
@@ -201,33 +199,6 @@ func (p *Processor) doComplCmd(meta Meta) error {
 	p.tg.SendMessageRM(meta.ChatId, sentStr, mainMenuBtns)
 	if err != nil {
 		return e.Wrap("can't do complCmd", err)
-	}
-
-	return nil
-}
-
-func (p *Processor) doAllTasksCmd(meta Meta) error {
-	tasks, err := p.storage.AllTasks(meta.UserId)
-	if err != nil {
-		return e.Wrap("can't do alltasksCmd", err)
-	}
-
-	if len(tasks) == 0 {
-		p.tg.SendMessageRM(meta.ChatId, noTasksMsg, mainMenuBtns)
-		if err != nil {
-			return e.Wrap("can't do alltasksCmd", err)
-		}
-
-		return nil
-	}
-
-	tasksStr := makeTasksString(tasks)
-
-	sentStr := allTasksMsg + tasksStr
-
-	p.tg.SendMessageRM(meta.ChatId, sentStr, mainMenuBtns)
-	if err != nil {
-		return e.Wrap("can't do alltasksCmd", err)
 	}
 
 	return nil

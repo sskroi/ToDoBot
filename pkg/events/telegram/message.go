@@ -26,10 +26,8 @@ const (
 const (
 	noUncomplTasksMsg = "👌 У вас нет незавершённых задач."
 	noComplTasksMsg   = "🤷🏻‍♀️ У вас нет завершённых задач."
-	noTasksMsg        = "🤷🏻‍♀️ У вас нет никаких задач."
 	UnComplTasksMsg   = "⤵️ Список незавершённых задач:\n\n"
 	ComplTasks        = "⤵️ Список завершённых задач:\n\n"
-	allTasksMsg       = "⤵️ Список всех задач:\n\n"
 	taskNotExistMsg   = "❌ Задачи с таким названием не существует."
 )
 
@@ -69,7 +67,6 @@ const (
 	addTaskBtn = "➕ Add task"
 	delTaskBtn = "🗑 Delete task"
 
-	allTasksBtn   = "📊 all"
 	complTasksBtn = "☑️ compl."
 	configTimeBtn = "⚙️ config."
 )
@@ -79,7 +76,7 @@ var mainMenuBtns = telegram.NewReplyKeyboard([][]string{
 	{uncomplTasksBtn},
 	{closeTaskBtn},
 	{addTaskBtn, delTaskBtn},
-	{allTasksBtn, complTasksBtn, configTimeBtn},
+	{complTasksBtn, configTimeBtn},
 })
 
 const (

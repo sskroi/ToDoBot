@@ -15,7 +15,6 @@ type Storage interface {
 	CloseTask(userId uint64, title string) error
 	Uncompl(userId uint64) ([]Task, error)
 	Compl(userId uint64) ([]Task, error)
-	AllTasks(userId uint64) ([]Task, error)
 }
 
 // Types of state
