@@ -66,6 +66,8 @@ func (p *Processor) doCmd(text string, meta Meta) error {
 		err = p.doUncomplCmd(meta)
 	case complTasksBtn:
 		err = p.doComplCmd(meta)
+	case notifCmd:
+		err = p.doNotifCmd(meta)
 	default:
 		err = p.doUnknownCmd(meta)
 	}
@@ -91,6 +93,10 @@ func (p *Processor) doHelpCmd(meta Meta) error {
 		return e.Wrap("can't do /help", err)
 	}
 
+	return nil
+}
+
+func (p *Processor) doNotifCmd(meta Meta) error {
 	return nil
 }
 
@@ -156,7 +162,7 @@ func (p *Processor) doUncomplCmd(meta Meta) error {
 		return nil
 	}
 
-	tasksStr := makeTasksString(tasks)
+	tasksStr := UncomplTasksString(tasks)
 
 	sentStr := UnComplTasksMsg + tasksStr
 

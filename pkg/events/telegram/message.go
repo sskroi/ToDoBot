@@ -82,6 +82,44 @@ const (
 	dateTimeFormat = "02.01.2006 15:04"
 )
 
+func UncomplTasksString(tasks []storage.Task) string {
+	var res string = ""
+	for _, v := range tasks {
+		titleString := fmt.Sprintf("🔖 * <code>%s</code> *\n", v.Title)
+
+		var timeToDeadLineStr string
+		curTime := time.Now().Unix()
+		if int64(v.Deadline) < curTime {
+			diff := time.Unix(curTime, 0).Sub(time.Unix(int64(v.Deadline), 0))
+			d := int(diff.Hours()) / 24
+			h := int(diff.Hours()) % 24
+			m := int(diff.Minutes()) % 60
+
+			timeToDeadLineStr = fmt.Sprintf("🚫 Overdue: %dd %dh %dm\n", d, h, m)
+		} else {
+			diff := time.Unix(int64(v.Deadline), 0).Sub(time.Unix(curTime, 0))
+			d := int(diff.Hours()) / 24
+			h := int(diff.Hours()) % 24
+			m := int(diff.Minutes()) % 60
+
+			timeToDeadLineStr = fmt.Sprintf("⏳ Remaining: %dd %dh %dm\n", d, h, m)
+		}
+
+		deadlineString := fmt.Sprintf("🗓 Deadline: %s\n", time.Unix(int64(v.Deadline), 0).Format(dateTimeFormat))
+
+		var descrString string
+		if utf8.RuneCount([]byte(v.Description)) < 2 {
+			descrString = ""
+		} else {
+			descrString = fmt.Sprintf("🗒 Description: %s\n", v.Description)
+		}
+
+		res += titleString + timeToDeadLineStr + deadlineString + descrString + "\n"
+	}
+
+	return res
+}
+
 func makeTasksString(tasks []storage.Task) string {
 	var res string = ""
 	for _, v := range tasks {
