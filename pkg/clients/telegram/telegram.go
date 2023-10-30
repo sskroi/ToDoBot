@@ -24,8 +24,8 @@ type Client struct {
 }
 
 // New возвращает объект для взаимодействия с API telegram
-func New(token string) Client {
-	return Client{
+func New(token string) *Client {
+	return &Client{
 		host:     tgBotHost,
 		basePath: "bot" + token,
 		client:   http.Client{},

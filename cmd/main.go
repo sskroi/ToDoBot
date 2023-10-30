@@ -24,7 +24,7 @@ func main() {
 		log.Fatalf("can't init storage: %s", err.Error())
 	}
 
-	processor := telegram.New(&tgClient, storage)
+	processor := telegram.New(tgClient, storage)
 
 	mainLoop := processorloop.New(processor, 100)
 	err = mainLoop.Start()
