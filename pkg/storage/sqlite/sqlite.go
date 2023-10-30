@@ -60,6 +60,7 @@ func (s *SqliteStorage) init() error {
 		create_time INTEGER DEFAULT 0,
 		deadline INTEGER DEFAULT 0,
 		done INTEGER NOT NULL DEFAULT 0,
+		finish_time INTEGER DEFAULT 0,
 		UNIQUE (user_id, title)
 	);`
 	if _, err := s.db.Exec(queryTasks); err != nil {
@@ -215,7 +216,7 @@ func (s *SqliteStorage) Delete(userId uint64, title string) error {
 // CloseTask sets the done field to 1 for the task and
 // returns storage.ErrAlreayClosed if task already closed
 // returns ErrNotExist if task not exist
-func (s *SqliteStorage) CloseTask(userId uint64, title string) error {
+func (s *SqliteStorage) CloseTask(userId uint64, title string, finishTime uint64) error {
 	err := s.isTaskExist(userId, title)
 	if err == storage.ErrNotExist {
 		return err
@@ -223,9 +224,9 @@ func (s *SqliteStorage) CloseTask(userId uint64, title string) error {
 		return err
 	}
 
-	qForUpdateDone := `UPDATE tasks SET done = 1 WHERE user_id = ? AND title = ? AND done != 1;`
+	qForUpdateDone := `UPDATE tasks SET done = 1, finish_time = ? WHERE user_id = ? AND title = ? AND done != 1;`
 
-	res, err := s.db.Exec(qForUpdateDone, userId, title)
+	res, err := s.db.Exec(qForUpdateDone, finishTime, userId, title)
 	if err != nil {
 		return e.Wrap("can't set done status", err)
 	}
@@ -292,7 +293,7 @@ func (s *SqliteStorage) getTasks(userId uint64, qFilter int) ([]storage.Task, er
 	for rows.Next() {
 		var newT = storage.Task{}
 		err := rows.Scan(&newT.TaskId, &newT.UserId, &newT.Title,
-			&newT.Description, &newT.CreateTime, &newT.Deadline, &newT.Done)
+			&newT.Description, &newT.CreateTime, &newT.Deadline, &newT.Done, &newT.FinishTime)
 		if err != nil {
 			return nil, e.Wrap("can't scan tasks", err)
 		}

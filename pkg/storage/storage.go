@@ -12,7 +12,7 @@ type Storage interface {
 	UpdDescription(userId uint64, description string) error
 	UpdDeadline(userId uint64, deadline, createTime uint64) error
 	Delete(userId uint64, title string) error
-	CloseTask(userId uint64, title string) error
+	CloseTask(userId uint64, title string, finishTime uint64) error
 	Uncompl(userId uint64) ([]Task, error)
 	Compl(userId uint64) ([]Task, error)
 }
@@ -42,6 +42,7 @@ type Task struct {
 	CreateTime  uint64 `db:"create_time"`
 	Deadline    uint64 `db:"deadline"`
 	Done        bool   `db:"done"`
+	FinishTime  uint64 `db:"finish_time"`
 }
 
 type User struct {

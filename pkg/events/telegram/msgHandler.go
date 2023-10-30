@@ -328,7 +328,7 @@ func (p *Processor) closeTask(text string, meta Meta) error {
 		return e.Wrap("can't close task", err)
 	}
 
-	err = p.storage.CloseTask(meta.UserId, text)
+	err = p.storage.CloseTask(meta.UserId, text, meta.Date)
 	if err == storage.ErrNotExist || err == storage.ErrAlreayClosed {
 		if err == storage.ErrNotExist {
 			if err := p.tg.SendMessageRM(meta.ChatId, taskNotExistMsg, mainMenuBtns); err != nil {
