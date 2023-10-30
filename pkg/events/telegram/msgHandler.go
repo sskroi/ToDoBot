@@ -189,7 +189,7 @@ func (p *Processor) doComplCmd(meta Meta) error {
 		return nil
 	}
 
-	tasksStr := makeTasksString(tasks)
+	tasksStr := complTasksString(tasks)
 
 	sentStr := ComplTasks + tasksStr
 

@@ -83,10 +83,8 @@ const (
 )
 
 func UncomplTasksString(tasks []storage.Task) string {
-	var res string = ""
+	var res string
 	for _, v := range tasks {
-		titleString := fmt.Sprintf("🔖 * <code>%s</code> *\n", v.Title)
-
 		var timeToDeadLineStr string
 		curTime := time.Now().Unix()
 		if int64(v.Deadline) < curTime {
@@ -105,52 +103,42 @@ func UncomplTasksString(tasks []storage.Task) string {
 			timeToDeadLineStr = fmt.Sprintf("⏳ Remaining: %dd %dh %dm\n", d, h, m)
 		}
 
-		deadlineString := fmt.Sprintf("🗓 Deadline: %s\n", time.Unix(int64(v.Deadline), 0).Format(dateTimeFormat))
-
-		var descrString string
-		if utf8.RuneCount([]byte(v.Description)) < 2 {
-			descrString = ""
-		} else {
-			descrString = fmt.Sprintf("🗒 Description: %s\n", v.Description)
-		}
-
-		res += titleString + timeToDeadLineStr + deadlineString + descrString + "\n"
+		res += titleString(v.Title) + timeToDeadLineStr + deadlineString(v.Deadline) + descrString(v.Description) + "\n"
 	}
 
 	return res
 }
 
-func makeTasksString(tasks []storage.Task) string {
-	var res string = ""
+func complTasksString(tasks []storage.Task) string {
+	var res string
 	for _, v := range tasks {
-		titleString := fmt.Sprintf("🧷 * <code>%s</code> *\n", v.Title)
+		finishTimeStr := fmt.Sprintf("✅ Finish time: %s\n", time.Unix(int64(v.FinishTime), 0).Format(dateTimeFormat))
 
-		var statusString string
-		if v.Done {
-			statusString = fmt.Sprintf("✅ %s\n", getDoneStatus(v.Done))
-		} else {
-			statusString = fmt.Sprintf("❌ %s\n", getDoneStatus(v.Done))
-		}
-
-		deadlineString := fmt.Sprintf("⏰ Дедлайн: %s\n", time.Unix(int64(v.Deadline), 0).Format(dateTimeFormat))
-
-		var descrString string
-		if utf8.RuneCount([]byte(v.Description)) < 2 {
-			descrString = ""
-		} else {
-			descrString = fmt.Sprintf("🗒 Описание: %s\n", v.Description)
-		}
-
-		res += titleString + statusString + deadlineString + descrString + "\n"
+		res += titleString(v.Title) + finishTimeStr + deadlineString(v.Deadline) + descrString(v.Description) + "\n"
 	}
 
 	return res
 }
 
-func getDoneStatus(status bool) string {
-	if !status {
-		return "Не выполнено"
+func titleString(title string) string {
+	titleString := fmt.Sprintf("🔖 * <code>%s</code> *\n", title)
+
+	return titleString
+}
+
+func deadlineString(deadline uint64) string {
+	deadlineString := fmt.Sprintf("🗓 Deadline: %s\n", time.Unix(int64(deadline), 0).Format(dateTimeFormat))
+
+	return deadlineString
+}
+
+func descrString(descr string) string {
+	var descrString string
+	if utf8.RuneCount([]byte(descr)) < 2 {
+		descrString = ""
 	} else {
-		return "Выполнено"
+		descrString = fmt.Sprintf("🗒 Description: %s\n", descr)
 	}
+
+	return descrString
 }
