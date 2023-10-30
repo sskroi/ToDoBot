@@ -53,7 +53,7 @@ func (c *Client) Updates(offset int, limit int) ([]Update, error) {
 }
 
 func (c *Client) SendMessage(chatId uint64, text string) error {
-	err := c.sendMessage(chatId, text, nil)
+	err := c.sendMsg(chatId, text, nil)
 	if err != nil {
 		return err
 	}
@@ -63,7 +63,7 @@ func (c *Client) SendMessage(chatId uint64, text string) error {
 
 // SendMessageRM sens message with `reply_markup` parameter
 func (c *Client) SendMessageRM(chatId uint64, text string, replyMarkup interface{}) error {
-	err := c.sendMessage(chatId, text, replyMarkup)
+	err := c.sendMsg(chatId, text, replyMarkup)
 	if err != nil {
 		return err
 	}
@@ -71,7 +71,7 @@ func (c *Client) SendMessageRM(chatId uint64, text string, replyMarkup interface
 	return nil
 }
 
-func (c *Client) sendMessage(chatId uint64, text string, replyMarkup interface{}) error {
+func (c *Client) sendMsg(chatId uint64, text string, replyMarkup interface{}) error {
 	querryParams := url.Values{}
 	querryParams.Add("chat_id", strconv.FormatUint(chatId, 10))
 	querryParams.Add("text", text)
