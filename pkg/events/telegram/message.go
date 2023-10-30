@@ -101,7 +101,7 @@ func UncomplTasksString(tasks []storage.Task) string {
 			h := int(diff.Hours()) % 24
 			m := int(diff.Minutes()) % 60
 
-			timeToDeadLineStr = fmt.Sprintf("🚫 %dd %dh %dm overdue\n", d, h, m)
+			timeToDeadLineStr = fmt.Sprintf("🚫 <b>%dd %dh %dm</b> overdue\n", d, h, m)
 
 		} else {
 			diff := time.Unix(int64(v.Deadline), 0).Sub(time.Unix(curTime, 0))
@@ -109,7 +109,7 @@ func UncomplTasksString(tasks []storage.Task) string {
 			h := int(diff.Hours()) % 24
 			m := int(diff.Minutes()) % 60
 
-			timeToDeadLineStr = fmt.Sprintf("⏳ %dd %dh %dm remaining\n", d, h, m)
+			timeToDeadLineStr = fmt.Sprintf("⏳ <b>%dd %dh %dm</b> remaining\n", d, h, m)
 		}
 
 		res += titleString(v.Title) + timeToDeadLineStr + deadlineString(v.Deadline) + descrString(v.Description) + "\n"
@@ -121,7 +121,7 @@ func UncomplTasksString(tasks []storage.Task) string {
 func complTasksString(tasks []storage.Task) string {
 	var res string
 	for _, v := range tasks {
-		finishTimeStr := fmt.Sprintf("⏱ %s finish time\n", time.Unix(int64(v.FinishTime), 0).Format(dateTimeFormat))
+		finishTimeStr := fmt.Sprintf("⏱ <b>%s</b> finish time\n", time.Unix(int64(v.FinishTime), 0).Format(dateTimeFormat))
 
 		res += titleString(v.Title) + finishTimeStr + deadlineString(v.Deadline) + descrString(v.Description) + "\n"
 	}
@@ -136,7 +136,7 @@ func titleString(title string) string {
 }
 
 func deadlineString(deadline uint64) string {
-	deadlineString := fmt.Sprintf("🗓 %s deadline\n", time.Unix(int64(deadline), 0).Format(dateTimeFormat))
+	deadlineString := fmt.Sprintf("🗓 <b>%s</b> deadline\n", time.Unix(int64(deadline), 0).Format(dateTimeFormat))
 
 	return deadlineString
 }
