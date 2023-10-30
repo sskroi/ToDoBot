@@ -58,18 +58,6 @@ const (
 	deletingSuccessDelete = "✅ Задача успешно удалена."
 )
 
-// Text for configure
-const (
-	configMsg = "⚙️ Настройка уведомлений:\n\n" +
-		"🔔 Через пробел 📝 введите моменты времени в формате \"ЧЧ:ММ\", в которые вам ежедневно будет приходить уведомление о ближайших дедлайнах\n\n" +
-		"🚫 Введите " + configNoNotifsCmd + " если не хотите получать уведомления\n\n" +
-		configCancelCmd + " - если не хотите вносить изменения"
-	configCancelCmd       = "/cancel"
-	configNoNotifsCmd     = "*"
-	configIncorrectInput  = "❌ Некорректный формат данных."
-	configSuccessNoNotifs = "✅ Вам не будут приходить уведомления."
-)
-
 // Text for main menu buttons
 const (
 	uncomplTasksBtn = "📌 Uncompleted tasks"
@@ -80,7 +68,6 @@ const (
 	delTaskBtn = "🗑 Delete task"
 
 	complTasksBtn = "🗄 Completed"
-	configBtn     = "⚙️ Configure"
 )
 
 // reply markup keyboard main menu var
@@ -88,7 +75,7 @@ var mainMenuBtns = telegram.NewReplyKeyboard([][]string{
 	{uncomplTasksBtn},
 	{closeTaskBtn},
 	{addTaskBtn, delTaskBtn},
-	{complTasksBtn, configBtn},
+	{complTasksBtn},
 })
 
 const (

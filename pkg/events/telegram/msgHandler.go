@@ -66,8 +66,6 @@ func (p *Processor) doCmd(text string, meta Meta) error {
 		err = p.doUncomplCmd(meta)
 	case complTasksBtn:
 		err = p.doComplCmd(meta)
-	case configBtn:
-		err = p.doConfigCmd(meta)
 	default:
 		err = p.doUnknownCmd(meta)
 	}
@@ -359,12 +357,6 @@ func (p *Processor) deleteTask(text string, meta Meta) error {
 	if err := p.tg.SendMessageRM(meta.ChatId, deletingSuccessDelete, mainMenuBtns); err != nil {
 		return e.Wrap("can't delete task", err)
 	}
-
-	return nil
-}
-
-func (p *Processor) doConfigCmd(meta Meta) error {
-	// ToDo
 
 	return nil
 }

@@ -66,16 +66,6 @@ func (s *SqliteStorage) init() error {
 		return e.Wrap("can't create table `tasks`", err)
 	}
 
-	queryNotifs := `CREATE TABLE IF NOT EXISTS notifs (
-		notif_id INTEGER PRIMARY KEY AUTOINCREMENT,
-		user_id INTEGER NOT NULL,
-		time_point INTEGER,
-		last_notif INTEGER DEFAULT 0
-	);`
-	if _, err := s.db.Exec(queryNotifs); err != nil {
-		return e.Wrap("can't create table `tasks`", err)
-	}
-
 	return nil
 }
 
