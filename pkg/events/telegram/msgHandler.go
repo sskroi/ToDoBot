@@ -53,7 +53,7 @@ func (p *Processor) doCmd(text string, meta Meta) error {
 
 	switch text {
 	case startCmd:
-		err = p.doStartCmd(meta)
+		err = p.doHelpCmd(meta)
 	case helpCmd:
 		err = p.doHelpCmd(meta)
 	case addTaskBtn:
@@ -80,15 +80,6 @@ func (p *Processor) doUnknownCmd(meta Meta) error {
 	err := p.tg.SendMessageRM(meta.ChatId, unknownCmdMsg, mainMenuBtns)
 	if err != nil {
 		return e.Wrap("can't do UnknownCmd", err)
-	}
-
-	return nil
-}
-
-func (p *Processor) doStartCmd(meta Meta) error {
-	err := p.tg.SendMessageRM(meta.ChatId, startMsg, mainMenuBtns)
-	if err != nil {
-		return e.Wrap("can't do /start", err)
 	}
 
 	return nil
