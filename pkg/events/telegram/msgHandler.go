@@ -102,6 +102,12 @@ func (p *Processor) doNotifCmd(meta Meta) error {
 		return e.Wrap("can't doNotifCmd", err)
 	}
 
+	if len(tasks) == 0 {
+		if err := p.tg.SendMessage(meta.ChatId, noUncomplTasksMsg); err != nil {
+			return e.Wrap("can't doNotifCmd", err)
+		}
+	}
+
 	tasksStr := UncomplTasksString(tasks)
 
 	if err := p.tg.SendMessage(meta.ChatId, tasksStr); err != nil {
