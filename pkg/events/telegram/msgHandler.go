@@ -207,6 +207,15 @@ func (p *Processor) adding1(text string, meta Meta) error {
 		return nil
 	}
 
+	if text[0] == '/' {
+		err := p.tg.SendMessage(meta.ChatId, addingMsg+TitleCantStartSlash)
+		if err != nil {
+			return e.Wrap(errMsg, err)
+		}
+
+		return nil
+	}
+
 	err := p.storage.UpdTitle(meta.UserId, text)
 	if errors.Is(err, storage.ErrUnique) {
 		if err := p.tg.SendMessage(meta.ChatId, addingMsg+taskAlreadyExistMsg); err != nil {
@@ -230,6 +239,15 @@ func (p *Processor) adding1(text string, meta Meta) error {
 }
 
 func (p *Processor) adding2(text string, meta Meta) error {
+	if text[0] == '/' {
+		err := p.tg.SendMessage(meta.ChatId, addingMsg+DescrCantStartSlash)
+		if err != nil {
+			return e.Wrap("can't add description to task", err)
+		}
+
+		return nil
+	}
+
 	err := p.storage.UpdDescription(meta.UserId, text)
 	if err != nil {
 		return e.Wrap("can't add description to task", err)
