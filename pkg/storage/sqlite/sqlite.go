@@ -27,14 +27,20 @@ func New(path string) (*SqliteStorage, error) {
 		return nil, e.Wrap("can't open database", err)
 	}
 
-	return &SqliteStorage{
+	storage := &SqliteStorage{
 		db: db,
-	}, nil
+	}
+
+	if err := storage.init(); err != nil {
+		return nil, e.Wrap("can't init storage", err)
+	}
+
+	return storage, nil
 }
 
 // Init инициализирует базу данных
 // (создёт таблицы,если они не были созданы)
-func (s *SqliteStorage) Init() error {
+func (s *SqliteStorage) init() error {
 	queryUsers := `CREATE TABLE IF NOT EXISTS users (
 		user_id INT PRIMARY KEY,
 		username VARCHAR(255) DEFAULT "",

@@ -19,11 +19,6 @@ func main() {
 		log.Fatalf("can't connect to storage: %s", err.Error())
 	}
 
-	err = storage.Init()
-	if err != nil {
-		log.Fatalf("can't init storage: %s", err.Error())
-	}
-
 	processor := telegram.New(tgClient, storage)
 
 	mainLoop := processorloop.New(processor, 100)
@@ -34,7 +29,7 @@ func main() {
 
 }
 
-// mustToken retrieves the value of flags (-tg-token, -db-path)
+// mustFlags retrieves the value of flags (-tg-token, -db-path)
 func mustFlags() (string, string) {
 	tgToken := flag.String("tg-token", "", "telegram bot token") // объявляем флан для получения токена при запуске программы
 	dbPath := flag.String("db-path", "", "sqlite3 db file path")
