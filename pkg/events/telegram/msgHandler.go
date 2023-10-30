@@ -97,6 +97,17 @@ func (p *Processor) doHelpCmd(meta Meta) error {
 }
 
 func (p *Processor) doNotifCmd(meta Meta) error {
+	tasks, err := p.storage.Uncompl(meta.UserId)
+	if err != nil {
+		return e.Wrap("can't doNotifCmd", err)
+	}
+
+	tasksStr := UncomplTasksString(tasks)
+
+	if err := p.tg.SendMessage(meta.ChatId, tasksStr); err != nil {
+		return e.Wrap("can't doNotifCmd", err)
+	}
+
 	return nil
 }
 

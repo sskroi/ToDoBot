@@ -271,13 +271,10 @@ func (s *SqliteStorage) getTasks(userId uint64, qFilter int) ([]storage.Task, er
 	switch qFilter {
 	case 0:
 		qForGetTasks =
-			`SELECT * FROM tasks WHERE user_id = ? AND done = 0;`
+			`SELECT * FROM tasks WHERE user_id = ? AND done = 0 ORDER BY deadline;`
 	case 1:
 		qForGetTasks =
 			`SELECT * FROM tasks WHERE user_id = ? AND done = 1;`
-	case 2:
-		qForGetTasks =
-			`SELECT * FROM tasks WHERE user_id = ? ORDER BY create_time DESC`
 	default:
 		return nil, errors.New("unknown qFilter")
 	}
