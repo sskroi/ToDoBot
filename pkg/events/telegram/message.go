@@ -26,8 +26,8 @@ const (
 const (
 	noUncomplTasksMsg = "👌 У вас нет незавершённых задач."
 	noComplTasksMsg   = "🤷🏻‍♀️ У вас нет завершённых задач."
-	UnComplTasksMsg   = "⤵️ Список незавершённых задач:\n\n"
-	ComplTasks        = "⤵️ Список завершённых задач:\n\n"
+	UnComplTasksMsg   = "⤵️ List of uncompleted tasks:\n\n"
+	ComplTasks        = "⤵️ List of completed tasks:\n\n"
 	taskNotExistMsg   = "❌ Задачи с таким названием не существует."
 )
 
@@ -93,14 +93,15 @@ func UncomplTasksString(tasks []storage.Task) string {
 			h := int(diff.Hours()) % 24
 			m := int(diff.Minutes()) % 60
 
-			timeToDeadLineStr = fmt.Sprintf("🚫 Overdue: %dd %dh %dm\n", d, h, m)
+			timeToDeadLineStr = fmt.Sprintf("🚫 %dd %dh %dm overdue\n", d, h, m)
+
 		} else {
 			diff := time.Unix(int64(v.Deadline), 0).Sub(time.Unix(curTime, 0))
 			d := int(diff.Hours()) / 24
 			h := int(diff.Hours()) % 24
 			m := int(diff.Minutes()) % 60
 
-			timeToDeadLineStr = fmt.Sprintf("⏳ Remaining: %dd %dh %dm\n", d, h, m)
+			timeToDeadLineStr = fmt.Sprintf("⏳ %dd %dh %dm remaining\n", d, h, m)
 		}
 
 		res += titleString(v.Title) + timeToDeadLineStr + deadlineString(v.Deadline) + descrString(v.Description) + "\n"
@@ -112,7 +113,7 @@ func UncomplTasksString(tasks []storage.Task) string {
 func complTasksString(tasks []storage.Task) string {
 	var res string
 	for _, v := range tasks {
-		finishTimeStr := fmt.Sprintf("✅ Finish time: %s\n", time.Unix(int64(v.FinishTime), 0).Format(dateTimeFormat))
+		finishTimeStr := fmt.Sprintf("⏱ %s finish time\n", time.Unix(int64(v.FinishTime), 0).Format(dateTimeFormat))
 
 		res += titleString(v.Title) + finishTimeStr + deadlineString(v.Deadline) + descrString(v.Description) + "\n"
 	}
@@ -127,7 +128,7 @@ func titleString(title string) string {
 }
 
 func deadlineString(deadline uint64) string {
-	deadlineString := fmt.Sprintf("🗓 Deadline: %s\n", time.Unix(int64(deadline), 0).Format(dateTimeFormat))
+	deadlineString := fmt.Sprintf("🗓 %s deadline\n", time.Unix(int64(deadline), 0).Format(dateTimeFormat))
 
 	return deadlineString
 }
@@ -137,7 +138,7 @@ func descrString(descr string) string {
 	if utf8.RuneCount([]byte(descr)) < 2 {
 		descrString = ""
 	} else {
-		descrString = fmt.Sprintf("🗒 Description: %s\n", descr)
+		descrString = fmt.Sprintf("🧷 %s\n", descr)
 	}
 
 	return descrString
