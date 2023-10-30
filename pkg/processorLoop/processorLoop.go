@@ -6,23 +6,23 @@ import (
 	"time"
 )
 
-type ProcessorLoop struct {
+type ProcLoop struct {
 	processor events.Processor
 	batchSize int
 }
 
-func New(processor events.Processor, batchSize int) ProcessorLoop {
-	return ProcessorLoop{
+func New(processor events.Processor, batchSize int) ProcLoop {
+	return ProcLoop{
 		processor: processor,
 		batchSize: batchSize,
 	}
 }
 
-func (p *ProcessorLoop) Start() error {
+func (p *ProcLoop) Start() error {
 	for {
 		gotEvents, err := p.processor.Fetch(p.batchSize)
 		if err != nil {
-			log.Printf("__ERR ProcessorLoop: %s", err.Error())
+			log.Printf("__ERR ProcLoop: %s", err.Error())
 
 			continue
 		}
@@ -44,7 +44,7 @@ func (p *ProcessorLoop) Start() error {
 	}
 }
 
-func (p *ProcessorLoop) handleEvents(events []events.Event) error {
+func (p *ProcLoop) handleEvents(events []events.Event) error {
 	for _, event := range events {
 		// log.Printf("got new event: %s", event.Text)
 

@@ -3,7 +3,7 @@ package main
 import (
 	tgC "ToDoBot1/pkg/clients/telegram"
 	"ToDoBot1/pkg/events/telegram"
-	processorloop "ToDoBot1/pkg/processorLoop"
+	"ToDoBot1/pkg/processorloop"
 	"ToDoBot1/pkg/storage/sqlite"
 	"flag"
 	"log"
@@ -12,8 +12,9 @@ import (
 func main() {
 	tgBotToken, dbPath := mustFlags()
 
-	// creating an object for interacting with the telegram api
+	// creating an object for interacting with telegram api
 	tgClient := tgC.New(tgBotToken)
+	// creating an object for interacting with sqlite3 storage
 	storage, err := sqlite.New(dbPath)
 	if err != nil {
 		log.Fatalf("can't connect to storage: %s", err.Error())
