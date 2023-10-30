@@ -1,7 +1,7 @@
 package main
 
 import (
-	tgClient "ToDoBot1/pkg/clients/telegram"
+	tgC "ToDoBot1/pkg/clients/telegram"
 	"ToDoBot1/pkg/events/telegram"
 	processorloop "ToDoBot1/pkg/processorLoop"
 	"ToDoBot1/pkg/storage/sqlite"
@@ -9,15 +9,12 @@ import (
 	"log"
 )
 
-const (
-	tgBotHost   = "api.telegram.org"
-	storagePath = "./db/db1.sqlite3"
-)
-
 func main() {
-	// создание объекта для взаимодействия с api телеграма
-	tgClient_ := tgClient.New(tgBotHost, mustToken())
-	storage, err := sqlite.New(storagePath)
+	tgBotToken, dbPath := mustFlags()
+
+	// creating an object for interacting with the telegram api
+	tgClient := tgC.New(tgBotToken)
+	storage, err := sqlite.New(dbPath)
 	if err != nil {
 		log.Fatalf("can't connect to storage: %s", err.Error())
 	}
@@ -27,7 +24,7 @@ func main() {
 		log.Fatalf("can't init storage: %s", err.Error())
 	}
 
-	processor := telegram.New(&tgClient_, storage)
+	processor := telegram.New(&tgClient, storage)
 
 	mainLoop := processorloop.New(processor, 100)
 	err = mainLoop.Start()
@@ -37,15 +34,20 @@ func main() {
 
 }
 
-// mustToken извлекает значение токена из флага tg-token
-func mustToken() string {
-	token := flag.String("tg-token", "", "telegram bot token") // объявляем флан для получения токена при запуске программы
+// mustToken retrieves the value of flags (-tg-token, -db-path)
+func mustFlags() (string, string) {
+	tgToken := flag.String("tg-token", "", "telegram bot token") // объявляем флан для получения токена при запуске программы
+	dbPath := flag.String("db-path", "", "sqlite3 db file path")
 
 	flag.Parse()
 
-	if *token == "" {
-		log.Fatal("Отсутствует токен для бота")
+	if *tgToken == "" {
+		log.Fatal("missing telegram bot token (-tg-token flag)")
 	}
 
-	return *token
+	if *dbPath == "" {
+		log.Fatal("missing database file path (-db-path flag)")
+	}
+
+	return *tgToken, *dbPath
 }

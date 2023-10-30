@@ -13,6 +13,8 @@ import (
 const (
 	getUpdatesMethod  = "getUpdates"
 	sendMessageMethod = "sendMessage"
+
+	tgBotHost = "api.telegram.org"
 )
 
 type Client struct {
@@ -22,9 +24,9 @@ type Client struct {
 }
 
 // New возвращает объект для взаимодействия с API telegram
-func New(host string, token string) Client {
+func New(token string) Client {
 	return Client{
-		host:     host,
+		host:     tgBotHost,
 		basePath: "bot" + token,
 		client:   http.Client{},
 	}
