@@ -4,6 +4,7 @@ import (
 	"ToDoBot1/pkg/clients/telegram"
 	"ToDoBot1/pkg/storage"
 	"fmt"
+	"log"
 	"time"
 	"unicode/utf8"
 )
@@ -119,9 +120,15 @@ func UncomplTasksString(tasks []storage.Task) string {
 }
 
 func complTasksString(tasks []storage.Task) string {
+	location, err := time.LoadLocation("Europe/Moscow")
+	if err != nil {
+		log.Fatal("can't load time location") // bad
+	}
+
 	var res string
 	for _, v := range tasks {
-		finishTimeStr := fmt.Sprintf("⏱ <b>%s</b> finish time\n", time.Unix(int64(v.FinishTime), 0).Format(dateTimeFormat))
+		finishTimeStr := fmt.Sprintf("⏱ <b>%s</b> finish time\n",
+			time.Unix(int64(v.FinishTime), 0).In(location).Format(dateTimeFormat))
 
 		res += titleString(v.Title) + finishTimeStr + deadlineString(v.Deadline) + descrString(v.Description) + "\n"
 	}
@@ -136,7 +143,13 @@ func titleString(title string) string {
 }
 
 func deadlineString(deadline uint64) string {
-	deadlineString := fmt.Sprintf("🗓 <b>%s</b> deadline\n", time.Unix(int64(deadline), 0).Format(dateTimeFormat))
+	location, err := time.LoadLocation("Europe/Moscow")
+	if err != nil {
+		log.Fatal("can't load time location") // bad
+	}
+
+	deadlineString := fmt.Sprintf("🗓 <b>%s</b> deadline\n", time.Unix(int64(deadline),
+		0).In(location).Format(dateTimeFormat))
 
 	return deadlineString
 }
