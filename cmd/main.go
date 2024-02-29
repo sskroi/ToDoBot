@@ -32,7 +32,7 @@ func main() {
 
 // mustFlags retrieves the value of flags (-tg-token, -db-path)
 func mustFlags() (string, string) {
-	tgToken := flag.String("tg-token", "", "telegram bot token") // объявляем флан для получения токена при запуске программы
+	tgToken := flag.String("tg-token", "", "telegram bot token")
 	dbPath := flag.String("db-path", "", "sqlite3 db file path")
 
 	flag.Parse()
