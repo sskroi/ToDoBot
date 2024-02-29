@@ -2,7 +2,7 @@
 Бот предоставляет реализацию простого ToDo списка в телеграм боте. С помощью бота можно добавить задачу в свой список задач, смотреть невыполненные задачи и время до их дедлайна, отмечать задачи как выполненные, просматривать архив выполненных задач с датой их выполнения, удалять задачи.
 
 # Launch
-* `docker build -t todobot .`
+* `docker build -t todobot {path/to/project/directory}`
 * `docker run --rm -e TG_TOKEN={your telegtam bot token} todobot:latest`
 
 # Mount database directory
