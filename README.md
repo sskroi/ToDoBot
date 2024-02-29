@@ -5,6 +5,9 @@
 * `docker build -t todobot {path/to/project/directory}`
 * `docker run --rm -e TG_TOKEN={your telegtam bot token} todobot:latest`
 
+or
+* `docker run --rm -e TG_TOKEN={your telegtam bot token} sskroi/todobot:0.1`
+
 # Mount database directory
 Используйте `-v {path/to/your/database/dir}:/app/database`
 когда запускаете контейнер с помощью `docker run` для сохранения файла с базой данных при перезапуске контейнера.
