@@ -171,7 +171,7 @@ func (p *Processor) doUncomplCmd(meta Meta) error {
 	}
 
 	if len(tasks) == 0 {
-		p.tg.SendMessageRM(meta.ChatId, noUncomplTasksMsg, mainMenuBtns)
+		err := p.tg.SendMessageRM(meta.ChatId, noUncomplTasksMsg, mainMenuBtns)
 		if err != nil {
 			return e.Wrap("can't do uncomplCmd", err)
 		}
@@ -183,8 +183,7 @@ func (p *Processor) doUncomplCmd(meta Meta) error {
 
 	sentStr := UnComplTasksMsg + tasksStr
 
-	p.tg.SendMessageRM(meta.ChatId, sentStr, mainMenuBtns)
-	if err != nil {
+	if err := p.tg.SendMessageRM(meta.ChatId, sentStr, mainMenuBtns); err != nil {
 		return e.Wrap("can't do uncomplCmd", err)
 	}
 
@@ -198,7 +197,7 @@ func (p *Processor) doComplCmd(meta Meta) error {
 	}
 
 	if len(tasks) == 0 {
-		p.tg.SendMessageRM(meta.ChatId, noComplTasksMsg, mainMenuBtns)
+		err := p.tg.SendMessageRM(meta.ChatId, noComplTasksMsg, mainMenuBtns)
 		if err != nil {
 			return e.Wrap("can't do complCmd", err)
 		}
@@ -210,8 +209,7 @@ func (p *Processor) doComplCmd(meta Meta) error {
 
 	sentStr := ComplTasks + tasksStr
 
-	p.tg.SendMessageRM(meta.ChatId, sentStr, mainMenuBtns)
-	if err != nil {
+	if err := p.tg.SendMessageRM(meta.ChatId, sentStr, mainMenuBtns); err != nil {
 		return e.Wrap("can't do complCmd", err)
 	}
 
