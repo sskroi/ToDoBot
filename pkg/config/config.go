@@ -16,6 +16,18 @@ type Config struct {
     Postgres postgres.Config `toml:"postgres"`
     Telegram telegram.Config `toml:"telegram"`
     SQLite sqlite.Config `toml:"sqlite"`
+    TLS TLSConfig `toml:"tls"`
+    Server ServerConfig `toml:"server"`
+}
+
+type ServerConfig struct {
+    URL string `toml:"url"`
+    Port string `toml:"port"`
+}
+
+type TLSConfig struct {
+    CertificatePath string `toml:"certificatePath"`
+    PrivateKeyPath string `toml:"privateKeyPath"`
 }
 
 func LoadConfig() *Config {

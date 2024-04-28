@@ -14,6 +14,15 @@ func main() {
 
 	// creating an object for interacting with telegram api
 	tgClient := telegramClient.New(config.Telegram)
+    err := tgClient.DeleteWebhook()
+    if err != nil {
+        panic(err)
+    }
+    err = tgClient.SetWebhook(config.Server.URL, config.TLS.CertificatePath)
+    if err != nil {
+        panic(err)
+    }
+
 	// creating an object for interacting with sqlite3 storage
 	storage, err := sqlite.New(config.SQLite)
 	if err != nil {

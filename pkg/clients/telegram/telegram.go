@@ -2,10 +2,15 @@ package telegram
 
 import (
 	"ToDoBot1/pkg/e"
+	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
+	"log"
+	"mime/multipart"
 	"net/http"
 	"net/url"
+	"os"
 	"path"
 	"strconv"
 )
@@ -14,6 +19,7 @@ const (
 	getUpdatesMethod  = "getUpdates"
 	sendMessageMethod = "sendMessage"
     deleteWebhookMethod = "deleteWebhook"
+    SetWebhookMethod = "setWebhook"
 )
 
 type Config struct {
@@ -42,6 +48,68 @@ func (c *Client) DeleteWebhook() error {
    }
 
    return nil
+}
+
+func (c *Client) SetWebhook(hookURL, certPath string) error {
+    file, err := os.Open(certPath)
+    if err != nil {
+        return e.Wrap("can't set webhook: ", err)
+    }
+    defer file.Close()
+    
+    fileContent, err := io.ReadAll(file)
+    if err != nil {
+        return err
+    }
+
+    fileInfo, err := file.Stat()
+    if err != nil {
+        return err
+    }
+
+    body := new(bytes.Buffer)
+    writer := multipart.NewWriter(body)
+    part, err := writer.CreateFormFile("certificate", fileInfo.Name())
+    if err != nil {
+        return err
+    }
+    if _, err := part.Write(fileContent); err != nil {
+        return err
+    }
+
+    if err := writer.WriteField("url", hookURL); err != nil {
+        return err
+    }
+    
+    url := url.URL{
+        Scheme: "https",
+        Host: c.host,
+        Path: path.Join(c.basePath, SetWebhookMethod),
+    }
+
+    t := writer.FormDataContentType()
+
+    if err := writer.Close(); err != nil {
+        return err
+    }
+
+
+    resp, err := http.Post(url.String(), t, body)
+    if err != nil {
+        return e.Wrap("can't set webhook: ", err)
+    }
+
+    fmt.Println(url.String(), writer.FormDataContentType(), body.String()) // debug info
+
+
+    respBody, err := io.ReadAll(resp.Body)
+    if err != nil {
+        return err
+    }
+
+    log.Println("telegram setWebhook answer: ", resp.StatusCode, string(respBody))
+
+    return nil
 }
 
 func (c *Client) Updates(offset int, limit int) ([]Update, error) {

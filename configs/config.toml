@@ -14,5 +14,9 @@ token = ""
 host = "api.telegram.org"
 
 [server]
-port = ""
+url = ""
+port = "443"
 
+[tls]
+certificatePath = ""
+privateKeyPath = ""
