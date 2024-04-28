@@ -10,6 +10,10 @@ import (
 	"github.com/mattn/go-sqlite3"
 )
 
+type Config struct {
+    DBPath string `toml:"dbpath"`
+}
+
 type SqliteStorage struct {
 	db *sql.DB
 }
@@ -17,8 +21,8 @@ type SqliteStorage struct {
 // New устанавливает соединение с файлом БД и возвращает
 // объект для взимодействия с базой данных sqlite3.
 // Возвращает ошибку, если не удалось открыть файл с БД.
-func New(path string) (*SqliteStorage, error) {
-	db, err := sql.Open("sqlite3", path)
+func New(cfg Config) (*SqliteStorage, error) {
+	db, err := sql.Open("sqlite3", cfg.DBPath)
 	if err != nil {
 		return nil, e.Wrap("can't open database", err)
 	}

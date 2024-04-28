@@ -13,9 +13,13 @@ import (
 const (
 	getUpdatesMethod  = "getUpdates"
 	sendMessageMethod = "sendMessage"
-
-	tgBotHost = "api.telegram.org"
+    deleteWebhookMethod = "deleteWebhook"
 )
+
+type Config struct {
+	Token string `toml:"token"`
+	Host  string `toml:"host"`
+}
 
 type Client struct {
 	host     string
@@ -23,13 +27,21 @@ type Client struct {
 	client   http.Client
 }
 
-// New возвращает объект для взаимодействия с API telegram
-func New(token string) *Client {
+func New(cfg Config) *Client {
 	return &Client{
-		host:     tgBotHost,
-		basePath: "bot" + token,
+		host:     cfg.Host,
+		basePath: "bot" + cfg.Token,
 		client:   http.Client{},
 	}
+}
+
+func (c *Client) DeleteWebhook() error {
+    _, err := c.doRequest(deleteWebhookMethod, url.Values{})
+   if err != nil {
+       return e.Wrap("can't delete webhook: ", err)
+   }
+
+   return nil
 }
 
 func (c *Client) Updates(offset int, limit int) ([]Update, error) {
@@ -109,7 +121,6 @@ func (c *Client) doRequest(method string, querryParams url.Values) ([]byte, erro
 		return nil, e.Wrap(errMsg, err)
 	}
 
-	// добавляем к объекту request параметры запроса
 	request.URL.RawQuery = querryParams.Encode()
 
 	resp, err := c.client.Do(request)
