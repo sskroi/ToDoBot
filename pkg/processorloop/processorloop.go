@@ -22,7 +22,7 @@ func (p *ProcLoop) Start() error {
 	for {
 		gotEvents, err := p.processor.Fetch(p.batchSize)
 		if err != nil {
-			log.Printf("__ERR ProcLoop: %s", err.Error())
+			log.Printf("ERROR ProcLoop: %s", err.Error())
 
 			continue
 		}
