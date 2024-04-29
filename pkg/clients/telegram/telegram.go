@@ -4,7 +4,6 @@ import (
 	"ToDoBot1/pkg/e"
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"mime/multipart"
@@ -53,9 +52,8 @@ func (c *Client) DeleteWebhook() error {
 func (c *Client) SetWebhook(hookURL, certPath string) error {
     file, err := os.Open(certPath)
     if err != nil {
-        return e.Wrap("can't set webhook: ", err)
+        return e.Wrap("can't open file with tls certificate: ", err)
     }
-    defer file.Close()
     
     fileContent, err := io.ReadAll(file)
     if err != nil {
@@ -64,6 +62,10 @@ func (c *Client) SetWebhook(hookURL, certPath string) error {
 
     fileInfo, err := file.Stat()
     if err != nil {
+        return err
+    }
+
+    if err := file.Close(); err != nil {
         return err
     }
 
@@ -80,6 +82,11 @@ func (c *Client) SetWebhook(hookURL, certPath string) error {
     if err := writer.WriteField("url", hookURL); err != nil {
         return err
     }
+    multipartType := writer.FormDataContentType()
+
+    if err := writer.Close(); err != nil {
+        return err
+    }
     
     url := url.URL{
         Scheme: "https",
@@ -87,27 +94,17 @@ func (c *Client) SetWebhook(hookURL, certPath string) error {
         Path: path.Join(c.basePath, SetWebhookMethod),
     }
 
-    t := writer.FormDataContentType()
-
-    if err := writer.Close(); err != nil {
-        return err
-    }
-
-
-    resp, err := http.Post(url.String(), t, body)
+    resp, err := http.Post(url.String(), multipartType, body)
     if err != nil {
         return e.Wrap("can't set webhook: ", err)
     }
-
-    fmt.Println(url.String(), writer.FormDataContentType(), body.String()) // debug info
-
 
     respBody, err := io.ReadAll(resp.Body)
     if err != nil {
         return err
     }
 
-    log.Println("telegram setWebhook answer: ", resp.StatusCode, string(respBody))
+    log.Println("INFO: telegram setWebhook answer: ", resp.StatusCode, string(respBody))
 
     return nil
 }
