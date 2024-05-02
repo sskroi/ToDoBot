@@ -1,4 +1,4 @@
-package telegramProc
+package telegramproc
 
 import (
 	"ToDoBot1/pkg/clients/telegram"
