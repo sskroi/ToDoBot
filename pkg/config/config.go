@@ -21,7 +21,7 @@ type Config struct {
 }
 
 type ServerConfig struct {
-    URL string `toml:"url"`
+    HookURL string `toml:"hookURL"`
     Port string `toml:"port"`
 }
 
@@ -30,15 +30,15 @@ type TLSConfig struct {
     PrivateKeyPath string `toml:"privateKeyPath"`
 }
 
-func LoadConfig() *Config {
+func LoadConfig() (*Config, error) {
     cfg := new(Config)
 
     _, err := toml.DecodeFile(configPath, cfg)
     if err != nil {
-        panic(err)
+        return nil, err
     }
 
-    return cfg
+    return cfg, nil
 }
 
 

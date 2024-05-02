@@ -11,11 +11,14 @@ import (
 )
 
 func main() {
-	config := config.LoadConfig()
+	config, err := config.LoadConfig()
+    if err != nil {
+        log.Fatalf("can't read config: %s", err.Error())
+    }
 
 	tgClient := telegram.New(config.Telegram)
 
-    err := tgClient.SetWebhook(config.Server.URL, config.TLS.CertificatePath)
+    err = tgClient.SetWebhook(config.Server.HookURL, config.TLS.CertificatePath)
 	if err != nil {
 		log.Fatalf("can't set telegram webhook: %s", err.Error())
 	}

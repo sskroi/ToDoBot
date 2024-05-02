@@ -14,7 +14,7 @@ token = ""
 host = "api.telegram.org"
 
 [server]
-url = ""
+hookURL = ""
 port = "443"
 
 [tls]
