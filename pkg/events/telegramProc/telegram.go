@@ -1,10 +1,11 @@
-package telegram
+package telegramProc
 
 import (
 	"ToDoBot1/pkg/clients/telegram"
 	"ToDoBot1/pkg/e"
 	"ToDoBot1/pkg/events"
 	"ToDoBot1/pkg/storage"
+	"encoding/json"
 	"errors"
 )
 
@@ -83,6 +84,23 @@ func (p *Processor) processMessage(event events.Event) error {
 	}
 
 	return nil
+}
+
+func (p *Processor) ProcessRequest(serializedUpdate []byte) error {
+    update := telegram.Update{}
+
+    err := json.Unmarshal(serializedUpdate, &update)
+    if err != nil {
+        return e.Wrap("can't unmarshal telegram update: ", err)
+    }
+
+    ev := event(update)
+    err = p.Process(ev)
+    if err != nil {
+        return e.Wrap("can't process event: ", err)
+    }
+    
+    return nil
 }
 
 func getMeta(event events.Event) (Meta, error) {
