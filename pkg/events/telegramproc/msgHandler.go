@@ -31,8 +31,6 @@ func (p *Processor) handleMsg(text string, meta Meta) error {
 		err = p.doCmd(text, meta)
 	case storage.Adding1:
 		err = p.adding1(text, meta)
-	case storage.Adding2:
-		err = p.adding2(text, meta)
 	case storage.Adding3:
 		err = p.adding3(text, meta)
 	case storage.Closing1:
@@ -66,8 +64,6 @@ func (p *Processor) doCmd(text string, meta Meta) error {
 		err = p.doUncomplCmd(meta)
 	case complTasksBtn:
 		err = p.doComplCmd(meta)
-	case notifCmd:
-		err = p.doNotifCmd(meta)
 	default:
 		err = p.doUnknownCmd(meta)
 	}
@@ -91,27 +87,6 @@ func (p *Processor) doHelpCmd(meta Meta) error {
 	err := p.tg.SendMessageRM(meta.ChatId, helpMsg, mainMenuBtns)
 	if err != nil {
 		return e.Wrap("can't do /help", err)
-	}
-
-	return nil
-}
-
-func (p *Processor) doNotifCmd(meta Meta) error {
-	tasks, err := p.storage.Uncompl(meta.UserId)
-	if err != nil {
-		return e.Wrap("can't doNotifCmd", err)
-	}
-
-	if len(tasks) == 0 {
-		if err := p.tg.SendMessage(meta.ChatId, noUncomplTasksMsg); err != nil {
-			return e.Wrap("can't doNotifCmd", err)
-		}
-	}
-
-	tasksStr := UncomplTasksString(tasks)
-
-	if err := p.tg.SendMessage(meta.ChatId, tasksStr); err != nil {
-		return e.Wrap("can't doNotifCmd", err)
 	}
 
 	return nil
@@ -248,38 +223,12 @@ func (p *Processor) adding1(text string, meta Meta) error {
 		return e.Wrap(errMsg, err)
 	}
 
-	if err := p.storage.SetState(meta.UserId, storage.Adding2); err != nil {
+	if err := p.storage.SetState(meta.UserId, storage.Adding3); err != nil {
 		return e.Wrap(errMsg, err)
 	}
 
 	if err := p.tg.SendMessage(meta.ChatId, addingMsg+successTitleSetMsg); err != nil {
 		return e.Wrap(errMsg, err)
-	}
-
-	return nil
-}
-
-func (p *Processor) adding2(text string, meta Meta) error {
-	if text[0] == '/' {
-		err := p.tg.SendMessage(meta.ChatId, addingMsg+DescrCantStartSlash)
-		if err != nil {
-			return e.Wrap("can't add description to task", err)
-		}
-
-		return nil
-	}
-
-	err := p.storage.UpdDescription(meta.UserId, text)
-	if err != nil {
-		return e.Wrap("can't add description to task", err)
-	}
-
-	if err := p.storage.SetState(meta.UserId, storage.Adding3); err != nil {
-		return e.Wrap("can't add description to task", err)
-	}
-
-	if err := p.tg.SendMessage(meta.ChatId, addingMsg+successDescrSetMsg); err != nil {
-		return e.Wrap("can't add description to task", err)
 	}
 
 	return nil

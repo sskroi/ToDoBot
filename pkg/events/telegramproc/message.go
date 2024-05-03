@@ -6,67 +6,61 @@ import (
 	"fmt"
 	"log"
 	"time"
-	"unicode/utf8"
 )
 
 // Text for cmds
 const (
 	helpCmd  = "/help"
 	startCmd = "/start"
-	notifCmd = "/notif"
 )
 
 // Text for /help and /start cmds
 const (
-	helpMsg = "🤖 Бот предоставляет реализацию простого 📌ToDo списка.\n" +
-		"❗️ Вы можете * <code>cкопировать</code> * название задачи <code>кликнув</code> на него.\n\n" +
-		uncomplTasksBtn + "  →  список незавершённых задач\n" +
-		closeTaskBtn + "  →  отметить задачу как выполненную\n" +
-		addTaskBtn + "  →  добавить новую задачу\n" +
-		delTaskBtn + "  →  удалить задачу\n" +
-		closeTaskBtn + "  →  список завершённых задач\n" +
-		"\n" +
-		notifCmd + "  →  команда для получения информации о ближайших дедлайнах. Вы можете отправить сообщение с этой командой по расписанию (schedule message) для получения уведомления в удобное вам время."
+	helpMsg = "The bot provides an implementation of a simple ToDo list.\n" +
+        "You can * <code>copy</code> * the task name by clicking on it.\n\n" +
+		uncomplTasksBtn + "  →  list of unfinished tasks\n" +
+		closeTaskBtn + "  →  mark the task as completed\n" +
+		addTaskBtn + "  →  add new task\n" +
+		delTaskBtn + "  →  delete task\n" +
+		closeTaskBtn + "  →  list of completed tasks\n"
 
-	unknownCmdMsg = "❓ Неизвестная команда.\n\n/help - для просмотра доступных команд"
+	unknownCmdMsg = "❓ Unknown command.\n\n/help - to view the available commands"
 )
 
 // Text for output information about tasks
 const (
-	noUncomplTasksMsg = "👌 У вас нет незавершённых задач."
-	noComplTasksMsg   = "🤷🏻‍♀️ У вас нет завершённых задач."
+	noUncomplTasksMsg = "👌 You don't have any unfinished tasks.."
+	noComplTasksMsg   = "🤷🏻‍♀️ You don't have completed tasks."
 	UnComplTasksMsg   = "⤵️ List of uncompleted tasks:\n\n"
 	ComplTasks        = "⤵️ List of completed tasks:\n\n"
-	taskNotExistMsg   = "❌ Задачи с таким названием не существует."
+	taskNotExistMsg   = "❌ There is no task with this name."
 )
 
 // Text for adding task
 const (
-	addingMsg            = "➕ Добавление задачи:\n\n"
-	addingTitleMsg       = "📝 Введите уникальное название для новой задачи"
-	incorrectTitleMsg    = "❌ Некорректное название задачи.\n🔄 Попробуйте снова"
-	taskAlreadyExistMsg  = "❌ Задача с таким названием уже существует.\n🔄 Попробуйте другое название"
-	successTitleSetMsg   = "✅ Название успешно установлено.\n\n📝 Введите описание задачи\n\n❗️ Если длина описания будет меньше двух символов, то описание не будет отображаться в списках задач."
-	successDescrSetMsg   = "✅ Описание задачи успешно установлено.\n\n📝 Введите дату дедлайна для новой задачи в формате\n\n\"ДД.ММ.ГГГГ ЧЧ:ММ\"\n\n❗️ Вы можете не вводить время (ЧЧ:ММ), тогда оно будет установлено на <b>23:59</b>"
-	incorrectDeadlineMsg = "❌ Некорректный формат времени.\n🔄 Попробуйте снова\n\n📝 Введите дату дедлайна для новой задачи в формате\n\n\"ДД.ММ.ГГГГ ЧЧ:ММ\"\n\n❗️ Вы можете не вводить время (ЧЧ:ММ), тогда оно будет установлено на <b>23:59</b>"
-	successDeadlineMsg   = "✅ Задача успешно добавлена."
-	TitleCantStartSlash  = "❌ Некорректное название задачи. Название не может начинаться с символа \"/\"\n🔄 Попробуйте снова"
-	DescrCantStartSlash  = "❌ Некорректное описание задачи. Описание не может начинаться с символа \"/\"\n🔄 Попробуйте снова"
+	addingMsg            = "➕ Adding task:\n\n"
+	addingTitleMsg       = "📝 Enter unique name for new task"
+	incorrectTitleMsg    = "❌ Incorrect task name.\n🔄 Try again"
+	taskAlreadyExistMsg  = "❌ Task with this name already exists.\n🔄 Try another name"
+	successTitleSetMsg   = "✅ Name has been successfully set.\n\n📝 Enter deadline date for new task in the format\n\n\"dd.mm.YYYY HH:MM\"\n\nThe default value for time is <b>23:59</b>"
+	incorrectDeadlineMsg = "❌ Incorrect time format.\n🔄 Try again\n\nEnter deadline date for new task in the format\n\n\"dd.mm.YYYY HH:MM\"\n\nThe default value for time is <b>23:59</b>"
+	successDeadlineMsg   = "✅ Task was successfully added."
+	TitleCantStartSlash  = "❌ Incorrect task name. The name cannot start with a character \"/\"\n🔄 Try again"
 )
 
 // Text for closing task
 const (
-	closingMsg              = "✔️ Завершение задачи:\n\n"
-	closingTitleMsg         = "📝 Введите название задачи, которую вы хотите завершить"
-	closingAlreadyClosedMsg = "☑️ Задача уже выполнена."
-	closingSuccessClosed    = "✅ Задача успешно помечена как выполненная."
+	closingMsg              = "✔️ Completing task:\n\n"
+	closingTitleMsg         = "📝 Enter the name of the task you want to complete"
+	closingAlreadyClosedMsg = "☑️ Task has already been completed."
+	closingSuccessClosed    = "✅ Task has been successfully marked as completed."
 )
 
 // Text for deleting task
 const (
-	deletingMsg           = "🗑 Удаление задачи:\n\n"
-	deletingTitleMsg      = "📝 Введите название задачи, которую вы хотите удалить"
-	deletingSuccessDelete = "✅ Задача успешно удалена."
+	deletingMsg           = "🗑 Deleting task:\n\n"
+	deletingTitleMsg      = "📝 Enter the name of the task you want to delete"
+	deletingSuccessDelete = "✅ Task was successfully deleted."
 )
 
 // Text for main menu buttons
@@ -113,7 +107,7 @@ func UncomplTasksString(tasks []storage.Task) string {
 			timeToDeadLineStr = fmt.Sprintf("⏳ <b>%dd %dh %dm</b> remaining\n", d, h, m)
 		}
 
-		res += titleString(v.Title) + timeToDeadLineStr + deadlineString(v.Deadline) + descrString(v.Description) + "\n"
+		res += titleString(v.Title) + timeToDeadLineStr + deadlineString(v.Deadline) + "\n"
 	}
 
 	return res
@@ -130,7 +124,7 @@ func complTasksString(tasks []storage.Task) string {
 		finishTimeStr := fmt.Sprintf("⏱ <b>%s</b> finish time\n",
 			time.Unix(int64(v.FinishTime), 0).In(location).Format(dateTimeFormat))
 
-		res += titleString(v.Title) + finishTimeStr + deadlineString(v.Deadline) + descrString(v.Description) + "\n"
+		res += titleString(v.Title) + finishTimeStr + deadlineString(v.Deadline) + "\n"
 	}
 
 	return res
@@ -154,13 +148,3 @@ func deadlineString(deadline uint64) string {
 	return deadlineString
 }
 
-func descrString(descr string) string {
-	var descrString string
-	if utf8.RuneCount([]byte(descr)) < 2 {
-		descrString = ""
-	} else {
-		descrString = fmt.Sprintf("🧷 %s\n", descr)
-	}
-
-	return descrString
-}
