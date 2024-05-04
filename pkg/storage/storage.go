@@ -22,7 +22,6 @@ const (
 	DefState    int = 10
 	Adding1     int = 21
 	Adding2     int = 22
-	Adding3     int = 23
 	Deleting1   int = 31
 	Closing1    int = 41
 	ConfigState int = 51

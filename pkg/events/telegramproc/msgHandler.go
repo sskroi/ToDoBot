@@ -31,8 +31,8 @@ func (p *Processor) handleMsg(text string, meta Meta) error {
 		err = p.doCmd(text, meta)
 	case storage.Adding1:
 		err = p.adding1(text, meta)
-	case storage.Adding3:
-		err = p.adding3(text, meta)
+	case storage.Adding2:
+		err = p.adding2(text, meta)
 	case storage.Closing1:
 		err = p.closeTask(text, meta)
 	case storage.Deleting1:
@@ -223,7 +223,7 @@ func (p *Processor) adding1(text string, meta Meta) error {
 		return e.Wrap(errMsg, err)
 	}
 
-	if err := p.storage.SetState(meta.UserId, storage.Adding3); err != nil {
+	if err := p.storage.SetState(meta.UserId, storage.Adding2); err != nil {
 		return e.Wrap(errMsg, err)
 	}
 
@@ -234,7 +234,7 @@ func (p *Processor) adding1(text string, meta Meta) error {
 	return nil
 }
 
-func (p *Processor) adding3(text string, meta Meta) error {
+func (p *Processor) adding2(text string, meta Meta) error {
 	deadlineUnixTime, err := parseTime(text)
 	if err == ErrIncorrectTimeFormat {
 		if err := p.tg.SendMessage(meta.ChatId, addingMsg+incorrectDeadlineMsg); err != nil {

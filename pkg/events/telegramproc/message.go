@@ -29,7 +29,7 @@ const (
 
 // Text for output information about tasks
 const (
-	noUncomplTasksMsg = "👌 You don't have any unfinished tasks.."
+	noUncomplTasksMsg = "👌 You don't have any unfinished tasks."
 	noComplTasksMsg   = "🤷🏻‍♀️ You don't have completed tasks."
 	UnComplTasksMsg   = "⤵️ List of uncompleted tasks:\n\n"
 	ComplTasks        = "⤵️ List of completed tasks:\n\n"
