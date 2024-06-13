@@ -15,10 +15,10 @@ import (
 )
 
 const (
-	getUpdatesMethod  = "getUpdates"
-	sendMessageMethod = "sendMessage"
-    deleteWebhookMethod = "deleteWebhook"
-    SetWebhookMethod = "setWebhook"
+	getUpdatesMethod    = "getUpdates"
+	sendMessageMethod   = "sendMessage"
+	deleteWebhookMethod = "deleteWebhook"
+	SetWebhookMethod    = "setWebhook"
 )
 
 type Config struct {
@@ -41,72 +41,72 @@ func New(cfg Config) *Client {
 }
 
 func (c *Client) DeleteWebhook() error {
-    _, err := c.doRequest(deleteWebhookMethod, url.Values{})
-   if err != nil {
-       return e.Wrap("can't delete webhook: ", err)
-   }
+	_, err := c.doRequest(deleteWebhookMethod, url.Values{})
+	if err != nil {
+		return e.Wrap("can't delete webhook: ", err)
+	}
 
-   return nil
+	return nil
 }
 
 func (c *Client) SetWebhook(hookURL, certPath string) error {
-    file, err := os.Open(certPath)
-    if err != nil {
-        return e.Wrap("can't open file with tls certificate: ", err)
-    }
-    
-    fileContent, err := io.ReadAll(file)
-    if err != nil {
-        return err
-    }
+	file, err := os.Open(certPath)
+	if err != nil {
+		return e.Wrap("can't open file with tls certificate: ", err)
+	}
 
-    fileInfo, err := file.Stat()
-    if err != nil {
-        return err
-    }
+	fileContent, err := io.ReadAll(file)
+	if err != nil {
+		return err
+	}
 
-    if err := file.Close(); err != nil {
-        return err
-    }
+	fileInfo, err := file.Stat()
+	if err != nil {
+		return err
+	}
 
-    body := new(bytes.Buffer)
-    writer := multipart.NewWriter(body)
-    part, err := writer.CreateFormFile("certificate", fileInfo.Name())
-    if err != nil {
-        return err
-    }
-    if _, err := part.Write(fileContent); err != nil {
-        return err
-    }
+	if err := file.Close(); err != nil {
+		return err
+	}
 
-    if err := writer.WriteField("url", hookURL); err != nil {
-        return err
-    }
-    multipartType := writer.FormDataContentType()
+	body := new(bytes.Buffer)
+	writer := multipart.NewWriter(body)
+	part, err := writer.CreateFormFile("certificate", fileInfo.Name())
+	if err != nil {
+		return err
+	}
+	if _, err := part.Write(fileContent); err != nil {
+		return err
+	}
 
-    if err := writer.Close(); err != nil {
-        return err
-    }
-    
-    url := url.URL{
-        Scheme: "https",
-        Host: c.host,
-        Path: path.Join(c.basePath, SetWebhookMethod),
-    }
+	if err := writer.WriteField("url", hookURL); err != nil {
+		return err
+	}
+	multipartType := writer.FormDataContentType()
 
-    resp, err := http.Post(url.String(), multipartType, body)
-    if err != nil {
-        return e.Wrap("can't set webhook: ", err)
-    }
+	if err := writer.Close(); err != nil {
+		return err
+	}
 
-    respBody, err := io.ReadAll(resp.Body)
-    if err != nil {
-        return err
-    }
+	url := url.URL{
+		Scheme: "https",
+		Host:   c.host,
+		Path:   path.Join(c.basePath, SetWebhookMethod),
+	}
 
-    log.Println("INFO: telegram setWebhook answer: ", resp.StatusCode, string(respBody))
+	resp, err := http.Post(url.String(), multipartType, body)
+	if err != nil {
+		return e.Wrap("can't set webhook: ", err)
+	}
 
-    return nil
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	log.Println("INFO: telegram setWebhook answer: ", resp.StatusCode, string(respBody))
+
+	return nil
 }
 
 func (c *Client) Updates(offset int, limit int) ([]Update, error) {

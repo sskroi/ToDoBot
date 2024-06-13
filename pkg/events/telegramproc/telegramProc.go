@@ -87,20 +87,20 @@ func (p *Processor) processMessage(event events.Event) error {
 }
 
 func (p *Processor) ProcessRequest(serializedUpdate []byte) error {
-    update := telegram.Update{}
+	update := telegram.Update{}
 
-    err := json.Unmarshal(serializedUpdate, &update)
-    if err != nil {
-        return e.Wrap("can't unmarshal telegram update: ", err)
-    }
+	err := json.Unmarshal(serializedUpdate, &update)
+	if err != nil {
+		return e.Wrap("can't unmarshal telegram update: ", err)
+	}
 
-    ev := event(update)
-    err = p.Process(ev)
-    if err != nil {
-        return e.Wrap("can't process event: ", err)
-    }
-    
-    return nil
+	ev := event(update)
+	err = p.Process(ev)
+	if err != nil {
+		return e.Wrap("can't process event: ", err)
+	}
+
+	return nil
 }
 
 func getMeta(event events.Event) (Meta, error) {

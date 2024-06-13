@@ -11,7 +11,7 @@ import (
 )
 
 type Config struct {
-    DBPath string `toml:"dbpath"`
+	DBPath string `toml:"dbpath"`
 }
 
 type SqliteStorage struct {

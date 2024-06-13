@@ -17,7 +17,7 @@ const (
 // Text for /help and /start cmds
 const (
 	helpMsg = "The bot provides an implementation of a simple ToDo list.\n" +
-        "You can * <code>copy</code> * the task name by clicking on it.\n\n" +
+		"You can * <code>copy</code> * the task name by clicking on it.\n\n" +
 		uncomplTasksBtn + "  →  list of unfinished tasks\n" +
 		closeTaskBtn + "  →  mark the task as completed\n" +
 		addTaskBtn + "  →  add new task\n" +
@@ -147,4 +147,3 @@ func deadlineString(deadline uint64) string {
 
 	return deadlineString
 }
-
