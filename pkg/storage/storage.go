@@ -34,14 +34,13 @@ var (
 )
 
 type Task struct {
-	TaskId      uint64 `db:"task_id"`
-	UserId      uint64 `db:"user_id"`
-	Title       string `db:"title"`
-	Description string `db:"description"`
-	CreateTime  uint64 `db:"create_time"`
-	Deadline    uint64 `db:"deadline"`
-	Done        bool   `db:"done"`
-	FinishTime  uint64 `db:"finish_time"`
+	TaskId     uint64 `db:"task_id"`
+	UserId     uint64 `db:"user_id"`
+	Name       string `db:"name"`
+	CreateTime uint64 `db:"create_time"`
+	Deadline   uint64 `db:"deadline"`
+	Done       bool   `db:"done"`
+	FinishTime uint64 `db:"finish_time"`
 }
 
 type User struct {

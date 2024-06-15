@@ -107,7 +107,7 @@ func UncomplTasksString(tasks []storage.Task) string {
 			timeToDeadLineStr = fmt.Sprintf("⏳ <b>%dd %dh %dm</b> remaining\n", d, h, m)
 		}
 
-		res += titleString(v.Title) + timeToDeadLineStr + deadlineString(v.Deadline) + "\n"
+		res += titleString(v.Name) + timeToDeadLineStr + deadlineString(v.Deadline) + "\n"
 	}
 
 	return res
@@ -124,7 +124,7 @@ func complTasksString(tasks []storage.Task) string {
 		finishTimeStr := fmt.Sprintf("⏱ <b>%s</b> finish time\n",
 			time.Unix(int64(v.FinishTime), 0).In(location).Format(dateTimeFormat))
 
-		res += titleString(v.Title) + finishTimeStr + deadlineString(v.Deadline) + "\n"
+		res += titleString(v.Name) + finishTimeStr + deadlineString(v.Deadline) + "\n"
 	}
 
 	return res

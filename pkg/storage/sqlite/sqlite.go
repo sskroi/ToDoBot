@@ -293,7 +293,7 @@ func (s *SqliteStorage) getTasks(userId uint64, qFilter int) ([]storage.Task, er
 
 	for rows.Next() {
 		var newT = storage.Task{}
-		err := rows.Scan(&newT.TaskId, &newT.UserId, &newT.Title,
+		err := rows.Scan(&newT.TaskId, &newT.UserId, &newT.Name,
 			&newT.Description, &newT.CreateTime, &newT.Deadline, &newT.Done, &newT.FinishTime)
 		if err != nil {
 			return nil, e.Wrap("can't scan tasks", err)
